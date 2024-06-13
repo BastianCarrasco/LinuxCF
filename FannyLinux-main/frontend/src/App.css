@@ -1,0 +1,219 @@
+#root {
+
+  margin: 0 auto;
+  padding: 0rem;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  width: 100%;
+  background-color: black;
+}
+
+nav {
+  width: 100%;
+  height: 50px;
+  /* Hace que el navbar ocupe todo el ancho de la pantalla */
+  background-color: #333;
+  /* Color de fondo del navbar */
+  color: #fff;
+  /* Color del texto del navbar */
+  padding: 10px;
+  /* Agrega un espacio interno al navbar */
+  box-sizing: border-box;
+  /* Incluye el padding en el ancho del navbar */
+}
+
+nav ul {
+  list-style-type: none;
+  display: flex;
+  /* Usa flexbox para alinear los elementos */
+  justify-content: space-between;
+  /* Distribuye los elementos equitativamente */
+  padding: 0;
+  margin: 0;
+  height: 20%;
+  /* Elimina los márgenes predeterminados */
+}
+
+nav li {
+  margin-right: 10px;
+  height: 10px;
+  /* Añade un pequeño margen entre los elementos */
+}
+
+nav li:last-child {
+  margin-right: 0;
+  height: 20%;
+  /* Elimina el margen del último elemento */
+}
+
+
+.botonNav {
+
+  
+  background-color: #007bff;
+  /* Color de fondo del botón */
+  color: white;
+  /* Color del texto del botón */
+  border: none;
+  /* Elimina el borde del botón */
+  padding: 5px 20px;
+  /* Espaciado interno del botón */
+  font-size: 16px;
+  /* Tamaño de la fuente del botón */
+  cursor: pointer;
+  /* Cambia el cursor al pasar sobre el botón */
+  text-decoration: none;
+  /* Elimina la subrayado del enlace */
+  border-radius: 5px;
+  /* Añade esquinas redondeadas al botón */
+}
+
+.botonNav:hover {
+  background-color: green;
+  /* Cambia el color de fondo al pasar sobre el botón */
+}
+
+.ModalAgregarMenu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 30%;
+  /* Ancho del modal */
+  max-width: 1300px;
+  /* Ancho máximo del modal */
+  height: auto;
+  /* Altura automática según el contenido */
+  background-color: black;
+  /* Color de fondo del modal */
+  border-radius: 10px;
+  /* Bordes redondeados */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  /* Sombra */
+  text-align: center;
+}
+
+.ModalAgregarMenu .modal-header {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.ModalAgregarMenu .modal-body {
+
+  width: 100%;
+  /* Establece el ancho al 100% */
+
+}
+
+
+.ModalAgregarMenu .modal-footer {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.ModalAgregarMenu .modal-footer button {
+  margin-right: 10px;
+}
+
+/* Agrega más estilos según sea necesario */
+.cancelar{
+  background-color: red;
+  color: white;
+  border: solid;
+  border-color: white;
+}
+
+.ToastContainer{
+  z-index: 1001;
+}
+
+.menu-container {
+  padding: 20px;
+}
+
+.tables-container {
+  display: flex;
+  border: solid;
+  border-color: black;
+}
+
+.day-table {
+  width: calc(100% / 6); /* Cada tabla ocupa 1/6 de la pantalla */
+  border: solid;
+  border-color: black;
+}
+
+.day-table h3 {
+  width: 100px; /* ajusta este valor según sea necesario */
+}
+.container_Caja {
+  display: flex; /* Utiliza flexbox para el diseño */
+}
+
+.column_Caja {
+  flex: 1; /* Hace que ambas columnas tengan el mismo tamaño */
+  border: 1px solid black; /* Añade un borde para visualizar las columnas */
+  padding: 10px; /* Añade espacio interno */
+  text-align: left;
+}
+.boton-original {
+  background-color: yellow; /* Color original del botón */
+  margin: 5px; /* Espacio entre botones */
+}
+
+.boton-apretado {
+  background-color: green; /* Color cuando el botón está presionado */
+  margin: 5px; /* Espacio entre botones */
+}
+
+.fila_botones_semana {
+  display: flex;
+  text-align: center;
+  
+ 
+}
+
+.fila_botones_semana > *:not(:last-child) {
+  margin-right: 10px; /* Añade un margen a la derecha para separar los elementos */
+}
+
+.boton {
+  font-size:14px;
+  background-color: yellow;
+  width: 130px; /* Establece el ancho deseado para los botones */
+  height: 50px; /* Establece la altura deseada para los botones */
+  margin-left: 10px;
+  margin-top:  10px;
+  border: solid;
+  border-color: white;
+
+}
+.full-width-table {
+  width: 100%; /* Establece el ancho de la tabla al 100% */
+}
+
+.third_div {
+  width: 100%; /* Ocupa todo el ancho disponible */
+  background-color: #ccc; /* Cambia el color de fondo según tus necesidades */
+  /* Otros estilos según tus necesidades */
+}
+
+
+.modalmodal {
+
+  background-color: black;
+
+}
