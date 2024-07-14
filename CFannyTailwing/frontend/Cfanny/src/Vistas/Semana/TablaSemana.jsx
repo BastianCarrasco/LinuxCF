@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 import { obtenerDatosSemana } from '../Consultas/GET/getDatosSemana';
 import { actualizarIdSemana } from '../Consultas/UPDATE/editarIdsemana';
+import { actualizarStockSemana } from '../Consultas/UPDATE/editarStockSemana';
 
 const TablaDia = ({ dia, datosSemana }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -15,7 +16,7 @@ const TablaDia = ({ dia, datosSemana }) => {
     function actualizarDias() {
         handleActualizarIdSemana()
           .then(() => {
-            window.location.reload(); // Recarga la página una vez completada la actualización
+            handleActualizarStockSemana();
           })
           .catch(error => {
             console.error('Error al actualizar los días:', error);
@@ -58,9 +59,33 @@ const TablaDia = ({ dia, datosSemana }) => {
         }
     }
 
+    async function handleActualizarStockSemana() {
+        try {
+            const diasNumeros = {
+                LUNES: 1,
+                MARTES: 2,
+                MIERCOLES: 3,
+                JUEVES: 4,
+                VIERNES: 5,
+                SABADO: 6
+            };
 
+            const p_id_dia = diasNumeros[diaSeleccionado];
 
+            for (const itemId of Object.keys(valorInputs)) {
+                const p_id_menu = parseInt(itemId, 10);
+                const p_stockD = parseInt(valorInputs[itemId], 10);
 
+                const resultado = await actualizarStockSemana(p_id_dia, p_id_menu, p_stockD);
+                console.log(`Resultado de la actualización de stock para ${diaSeleccionado}, elemento ${itemId}:`, resultado);
+            }
+
+            window.location.reload(); // Recargar la página una vez completada la actualización
+        } catch (error) {
+            console.error('Error al actualizar el stock de la semana:', error);
+            // Manejar el error según sea necesario
+        }
+    }
 
     useEffect(() => {
         console.log(botonesSeleccionados);
@@ -145,7 +170,7 @@ const TablaDia = ({ dia, datosSemana }) => {
             </button>
             {modalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-90">
-                    <div className="bg-black p-6 rounded-lg shadow-lg max-w-6xl w-full grid grid-cols-3 gap-4">
+                    <div className="bg-black p-6 rounded-lg shadow-lg max-w-8xl w-full grid grid-cols-3 gap-4">
                         <div>
                             <h2 className="text-xl font-semibold mb-4 text-white">Selecciona opciones</h2>
                             {Object.entries(datosMenuPorTipo).map(([tipo, items]) => (
@@ -158,6 +183,7 @@ const TablaDia = ({ dia, datosSemana }) => {
                                                     key={item.id}
                                                     className={`px-4 py-2 rounded-lg ${botonesSeleccionados.includes(item.id) ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}
                                                     onClick={() => handleClick(item)}
+                                                   style={{fontSize:'20px'}}
                                                 >
                                                     {item.nombre}
                                                 </button>
@@ -168,7 +194,7 @@ const TablaDia = ({ dia, datosSemana }) => {
                             ))}
                         </div>
 
-                        <div>
+                        <div  style={{fontSize:'20px'}}>
                             <h2 className="text-xl font-semibold mb-4 text-white">Elementos seleccionados</h2>
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-700 text-white">
@@ -195,7 +221,7 @@ const TablaDia = ({ dia, datosSemana }) => {
                             </table>
                         </div>
 
-                        <div>
+                        <div  style={{fontSize:'20px'}}>
                             <h2 className="text-xl font-semibold mb-4 text-white">Datos del Día {diaSeleccionado}</h2>
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-700 text-white">
@@ -224,7 +250,7 @@ const TablaDia = ({ dia, datosSemana }) => {
                             </table>
                         </div>
 
-                        <div className="col-span-3 flex justify-between items-center mt-4">
+                        <div  style={{fontSize:'20px'}} className="col-span-3 flex justify-between items-center mt-4">
                             <button
                                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition duration-200"
                                 onClick={closeModal}
