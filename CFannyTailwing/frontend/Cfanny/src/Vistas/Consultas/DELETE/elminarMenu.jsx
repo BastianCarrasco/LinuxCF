@@ -1,11 +1,12 @@
 // archivo: servicios/menuService.js
 
 import axios from 'axios';
+import { link } from '../servidor';
 
 // Función para enviar la solicitud DELETE
 export const eliminarMenu = async (nombre) => {
   try {
-    const response = await axios.delete('http://192.168.78.98:5150/quitar-menu', {
+    const response = await axios.delete(`http://${link}:5150/quitar-menu`, {
       data: { nombre } // Envía el nombre como parte del cuerpo de la solicitud
     });
     console.log('Respuesta del servidor:', response.data);

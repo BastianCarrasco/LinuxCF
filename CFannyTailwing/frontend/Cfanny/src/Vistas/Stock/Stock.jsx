@@ -60,27 +60,28 @@ export default function Stock() {
 
 
   return (
-    <div  className="flex items-center justify-center w-full  min-h-screen bg-black text-white">
+    <div   className="flex items-center justify-center w-full  min-h-screen bg-black text-white">
       <div className="flex w-full">
         <div className="w-1/2 bg-black p-4 rounded shadow-md border-white border-r">
           <h2 className="text-3xl font-bold mb-8">Stock</h2>
           <div className="bg-black">
             <div className="flex items-center mb-4">
-              <h3 className="text-xl font-bold mr-4">Menú Disponible</h3>
-              <div className="flex space-x-4" >
-                <button onClick={() => filtrarPorTipo(1)} className="text-white hover:underline">Proteina</button>
-                <button onClick={() => filtrarPorTipo(2)} className="text-white hover:underline">Acompaña</button>
-                <button onClick={() => filtrarPorTipo(3)} className="text-white hover:underline">Papas</button>
-                <button onClick={() => filtrarPorTipo(4)} className="text-white hover:underline">Empanadas</button>
-                <button onClick={() => filtrarPorTipo(5)} className="text-white hover:underline">Bebidas</button>
-                <button onClick={() => filtrarPorTipo(6)} className="text-white hover:underline">Ensalada</button>
-                <button onClick={() => filtrarPorTipo(7)} className="text-white hover:underline">Postre</button>
-                <button onClick={() => filtrarPorTipo(8)} className="text-white hover:underline">Otro</button>
-                <button onClick={() => filtrarPorTipo(9)} className="text-white hover:underline">Special</button>
-                <button onClick={() => filtrarPorTipo(10)} className="text-white hover:underline">Guiso</button>
+
+              <div style={{fontSize:"16px"}} className="flex space-x-4" >
+              <button onClick={() => filtrarPorTipo(1)} className="text-white hover:underline border-solid border-2 border-yellow-500 px-4 py-2 rounded-lg mb-2 mr-2">Proteina</button>
+<button onClick={() => filtrarPorTipo(2)} className="text-white hover:underline border-solid border-2 border-blue-500 px-4 py-2 rounded-lg mb-2 mr-2">Acompaña</button>
+<button onClick={() => filtrarPorTipo(3)} className="text-white hover:underline border-solid border-2 border-green-500 px-4 py-2 rounded-lg mb-2 mr-2">Papas</button>
+<button onClick={() => filtrarPorTipo(4)} className="text-white hover:underline border-solid border-2 border-red-500 px-4 py-2 rounded-lg mb-2 mr-2">Empanadas</button>
+<button onClick={() => filtrarPorTipo(5)} className="text-white hover:underline border-solid border-2 border-purple-500 px-4 py-2 rounded-lg mb-2 mr-2">Bebidas</button>
+<button onClick={() => filtrarPorTipo(6)} className="text-white hover:underline border-solid border-2 border-indigo-500 px-4 py-2 rounded-lg mb-2 mr-2">Ensalada</button>
+<button onClick={() => filtrarPorTipo(7)} className="text-white hover:underline border-solid border-2 border-pink-500 px-4 py-2 rounded-lg mb-2 mr-2">Postre</button>
+<button onClick={() => filtrarPorTipo(8)} className="text-white hover:underline border-solid border-2 border-yellow-600 px-4 py-2 rounded-lg mb-2 mr-2">Otro</button>
+<button onClick={() => filtrarPorTipo(9)} className="text-white hover:underline border-solid border-2 border-blue-600 px-4 py-2 rounded-lg mb-2 mr-2">Special</button>
+<button onClick={() => filtrarPorTipo(10)} className="text-white hover:underline border-solid border-2 border-green-600 px-4 py-2 rounded-lg mb-2 mr-2">Guiso</button>
+
               </div>
             </div>
-            <div className="overflow-x-auto">
+            <div  style={{fontSize:"20px"}}className="overflow-x-auto">
               <div className="max-h-96 overflow-y-auto">
                 <table className="min-w-full divide-y divide-gray-200" style={{border:'solid'}}>
                   <thead className="bg-black">
@@ -130,8 +131,3 @@ export default function Stock() {
     </div>
   );
 }
-
-
-
-
-

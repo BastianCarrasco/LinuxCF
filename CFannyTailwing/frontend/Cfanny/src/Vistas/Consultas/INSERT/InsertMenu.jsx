@@ -1,8 +1,8 @@
 import axios from 'axios';
-
+import { link } from '../servidor';
 export const insertarMenu = async (nombre, tipo, precio, stockG) => {
   try {
-    const response = await axios.post('http://192.168.78.98:5150/insertar-menu', {
+    const response = await axios.post(`http://${link}:5150/insertar-menu`, {
       nombre: nombre,
       tipo: tipo,
       precio: precio,

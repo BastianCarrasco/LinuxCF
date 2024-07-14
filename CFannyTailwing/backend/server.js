@@ -17,7 +17,7 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root', // Usuario de la base de datos
-  password: '5150', // Contraseña de la base de datos
+  password: '', // Contraseña de la base de datos
   database: 'fannyLinux' // Nombre de la base de datos
 });
 
@@ -260,7 +260,7 @@ app.get('/obtener-pedidos', (req, res) => {
 
 app.delete('/eliminar-pedidos-barra', (req, res) => {
   const { barra } = req.body; // Se asume que el valor de 'barra' se encuentra en el cuerpo de la solicitud
-  
+
   // Query SQL para eliminar pedidos con la barra proporcionada
   const query = 'DELETE FROM Pedidos WHERE Barra = ?';
 
@@ -348,6 +348,42 @@ function actualizarPreciosColacion(idColaciones, valor) {
   });
 }
 
+
+app.put('/actualizar-id-semana', (req, res) => {
+  const { p_id_dia,p_nuevo_id_menu,p_numero } = req.body;
+
+  // Llamar a la función para actualizar precios_colaciones
+  actualizaridsemana(p_id_dia,p_nuevo_id_menu,p_numero)
+    .then(results => {
+      res.json({ message: 'Tabla id semana actualizada correctamente', results });
+    })
+    .catch(error => {
+      console.error('Error al actualizar tabla precios_colaciones:', error);
+      res.status(500).json({ error: 'Error al actualizar tabla semanas', details: error });
+    });
+});
+
+// Función para actualizar precios_colaciones
+function actualizaridsemana(p_id_dia,p_nuevo_id_menu,p_numero) {
+  return new Promise((resolve, reject) => {
+    // Llamada al procedimiento almacenado
+    db.query(
+      'CALL actualizar_id_menu(?, ?, ?)',
+      [p_id_dia,p_nuevo_id_menu,p_numero],
+      (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      }
+    );
+  });
+}
+
+
+
+
 app.get('/preciosColaciones', (req, res) => {
   const query = `SELECT * FROM precios_colaciones`;
   db.query(query, (error, results) => {
@@ -366,6 +402,3 @@ const PORT = process.env.PORT || 5150;
 app.listen(PORT, () => {
   console.log(`Servidor backend escuchando en el puerto ${PORT}`);
 });
-
-
-
