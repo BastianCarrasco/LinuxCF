@@ -31,10 +31,10 @@ const TablaDia = ({ dia, datosSemana }) => {
             const diasNumeros = {
                 LUNES: 1,
                 MARTES: 2,
-                MIERCOLES: 3,
+                MIÉRCOLES: 3,
                 JUEVES: 4,
                 VIERNES: 5,
-                SABADO: 6
+                SÁBADO: 6
             };
 
             // Obtener el número correspondiente al día seleccionado
@@ -64,10 +64,10 @@ const TablaDia = ({ dia, datosSemana }) => {
             const diasNumeros = {
                 LUNES: 1,
                 MARTES: 2,
-                MIERCOLES: 3,
+                MIÉRCOLES: 3,
                 JUEVES: 4,
                 VIERNES: 5,
-                SABADO: 6
+                SÁBADO: 6
             };
 
             const p_id_dia = diasNumeros[diaSeleccionado];
