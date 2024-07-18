@@ -15,7 +15,7 @@ const ButtonList = ({ datosSemana, handleSelectData }) => {
     };
 
     return (
-        <div style={{ fontSize: "20px" }} className="grid grid-cols-5 gap-2">
+        <div style={{ fontSize: "18px" }} className="grid grid-cols-5 gap-2">
             {datosSemana.slice(0, 9).map((dato, index) => (
                 <button
                     key={index}
