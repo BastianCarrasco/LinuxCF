@@ -3,6 +3,7 @@ import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 import { obtenerDatosSemana } from '../Consultas/GET/getDatosSemana';
 import { actualizarIdSemana } from '../Consultas/UPDATE/editarIdsemana';
 import { actualizarStockSemana } from '../Consultas/UPDATE/editarStockSemana';
+import { actualizarStockGlobal } from '../Consultas/UPDATE/sumarStockGlobal';
 
 const TablaDia = ({ dia, datosSemana }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -11,6 +12,17 @@ const TablaDia = ({ dia, datosSemana }) => {
     const [valorInputs, setValorInputs] = useState({});
     const [datosMenu, setDatosMenu] = useState([]);
     const [datosSemanaFiltrados, setDatosSemanaFiltrados] = useState([]);
+
+    const ejecutarActualizacion = async () => {
+        try {
+          const resultado = await actualizarStockGlobal();
+          console.log('Resultado de la actualización:', resultado);
+        } catch (error) {
+          console.error('Error al ejecutar la actualización:', error);
+        }
+
+        window.location.reload(); // Recargar la página una vez completada la actualización
+      };
 
 
     function actualizarDias() {
@@ -80,7 +92,9 @@ const TablaDia = ({ dia, datosSemana }) => {
                 console.log(`Resultado de la actualización de stock para ${diaSeleccionado}, elemento ${itemId}:`, resultado);
             }
 
-            window.location.reload(); // Recargar la página una vez completada la actualización
+            ejecutarActualizacion();
+
+
         } catch (error) {
             console.error('Error al actualizar el stock de la semana:', error);
             // Manejar el error según sea necesario
@@ -129,6 +143,7 @@ const TablaDia = ({ dia, datosSemana }) => {
         setModalOpen(false);
         setBotonesSeleccionados([]);
         setValorInputs({});
+
     };
 
     const handleClick = (item) => {

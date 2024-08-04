@@ -14,11 +14,30 @@ const ButtonList = ({ datosSemana, handleSelectData }) => {
         setSelectedTipo(null);
     };
 
+    // Función para obtener botones únicos basados en `id`
+    const getUniqueButtons = (data) => {
+        const seenIds = new Set();
+        return data.filter(item => {
+            if (!seenIds.has(item.id)) {
+                seenIds.add(item.id);
+                return true;
+            }
+            return false;
+        });
+    };
+
+    // Botones de datos generales
+    const uniqueGeneralButtons = getUniqueButtons(datosSemana.slice(0, 9));
+
+    // Botones filtrados por tipo
+    const uniqueType3and12Buttons = getUniqueButtons(datosSemana.filter(dato => dato.tipo === 3 || dato.tipo === 12));
+    const uniqueType6and13and14Buttons = getUniqueButtons(datosSemana.filter(dato => dato.tipo === 6 || dato.tipo === 13 || dato.tipo === 14));
+
     return (
         <div style={{ fontSize: "18px" }} className="grid grid-cols-5 gap-2">
-            {datosSemana.slice(0, 9).map((dato, index) => (
+            {uniqueGeneralButtons.map((dato, index) => (
                 <button
-                    key={index}
+                    key={dato.id} // Usa `dato.id` como clave única
                     onClick={() => handleSelectData(dato)}
                     className="p-2 border rounded hover:bg-gray-200"
                     style={{ backgroundColor: "yellow", color: "black" }}
@@ -28,11 +47,10 @@ const ButtonList = ({ datosSemana, handleSelectData }) => {
                     {dato.stockD}
                 </button>
             ))}
-            <br></br>
 
-            {datosSemana.filter(dato => dato.tipo === 3 || dato.tipo === 12).map((dato, index) => (
+            {uniqueType3and12Buttons.map((dato, index) => (
                 <button
-                    key={index}
+                    key={dato.id} // Usa `dato.id` como clave única
                     onClick={() => handleSelectData(dato)}
                     className="p-2 border rounded hover:bg-gray-200"
                     style={{ backgroundColor: "orange", color: "black" }}
@@ -42,9 +60,10 @@ const ButtonList = ({ datosSemana, handleSelectData }) => {
                     {dato.stockD}
                 </button>
             ))}
-            {datosSemana.filter(dato => dato.tipo === 6 || dato.tipo === 13 || dato.tipo === 14).map((dato, index) => (
+
+            {uniqueType6and13and14Buttons.map((dato, index) => (
                 <button
-                    key={index}
+                    key={dato.id} // Usa `dato.id` como clave única
                     onClick={() => handleSelectData(dato)}
                     className="p-2 border rounded hover:bg-gray-200"
                     style={{ backgroundColor: "lightgreen", color: "black" }}
@@ -70,7 +89,7 @@ const ButtonList = ({ datosSemana, handleSelectData }) => {
                     }}
                 >
                     {tipo === 4 && 'Empanadas'}
-                    {tipo === 5 && 'Bebidas'}
+                    {tipo === 5 && 'Bebidas \n\n' }
                     {tipo === 7 && 'Postre'}
                     {tipo === 8 && 'Otro'}
                     {tipo === 9 && 'Special'}
@@ -84,29 +103,27 @@ const ButtonList = ({ datosSemana, handleSelectData }) => {
                         <h2 className="text-xl font-bold">Items del tipo {selectedTipo}</h2>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {datosSemana
-                                .filter(dato => dato.tipo === selectedTipo)
-                                .map((dato, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleSelectData(dato)}
-                                        className="p-2 border rounded hover:bg-gray-200"
-                                        style={{
-                                            backgroundColor:
-                                                selectedTipo === 4 ? "purple" :
-                                                    selectedTipo === 5 ? "brown" :
-                                                        selectedTipo === 7 ? "teal" :
-                                                            selectedTipo === 8 ? "gray" :
-                                                                selectedTipo === 9 ? "indigo" : "lightgray",
-                                            color: "white",
-                                            width: "100%", // Asegura que los botones ocupen todo el ancho disponible
-                                        }}
-                                    >
-                                        {dato.nombre}<br></br>
-                                        {dato.stockG}
-                                        {dato.stockD}
-                                    </button>
-                                ))}
+                            {getUniqueButtons(datosSemana.filter(dato => dato.tipo === selectedTipo)).map((dato, index) => (
+                                <button
+                                    key={dato.id} // Usa `dato.id` como clave única
+                                    onClick={() => handleSelectData(dato)}
+                                    className="p-2 border rounded hover:bg-gray-200"
+                                    style={{
+                                        backgroundColor:
+                                            selectedTipo === 4 ? "purple" :
+                                                selectedTipo === 5 ? "brown" :
+                                                    selectedTipo === 7 ? "teal" :
+                                                        selectedTipo === 8 ? "gray" :
+                                                            selectedTipo === 9 ? "indigo" : "lightgray",
+                                        color: "white",
+                                        width: "100%", // Asegura que los botones ocupen todo el ancho disponible
+                                    }}
+                                >
+                                    {dato.nombre}<br></br>
+                                    {dato.stockG}
+                                    {dato.stockD}
+                                </button>
+                            ))}
                         </div>
 
                         <button onClick={handleCloseModal} className="mt-4 p-2 bg-cyan-500 text-white rounded">
@@ -115,8 +132,6 @@ const ButtonList = ({ datosSemana, handleSelectData }) => {
                     </div>
                 </div>
             )}
-
-
         </div>
     );
 };

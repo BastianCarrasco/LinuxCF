@@ -33,13 +33,13 @@ export default function NuevoItem({ onInsertSuccess }) {
   };
 
   const handleTipoSeleccionado = (id) => {
-    
+
     setTipoNuevo(id);
-    setMensaje(`Tipo seleccionado: ${opcionesTipo[id-1].nombre}`);
+    setMensaje(`Tipo seleccionado: ${opcionesTipo[id].nombre}`);
   };
 
   return (
-    <div className="mt-4">
+    <div style={{fontSize:"20px"}}  className="mt-4">
       <h2 className="text-2xl font-bold mb-4">Insertar Nuevo Menú</h2>
       <div className="flex space-x-4">
         <div className="w-1/2">
@@ -68,7 +68,7 @@ export default function NuevoItem({ onInsertSuccess }) {
             onClick={handleInsertarMenu}
             className="mt-4 bg-yellow-500 text-white px-4 py-2 rounded font-bold hover:bg-yellow-600"
           >
-            Insertar Menú
+            <p style={{fontSize:"20px"}} >Inserta Menú</p>
           </button>
           {mensaje && (
             <p className="text-green-500 mt-2 font-bold">{mensaje}</p>
@@ -91,8 +91,3 @@ export default function NuevoItem({ onInsertSuccess }) {
     </div>
   );
 }
-
-
-
-
-

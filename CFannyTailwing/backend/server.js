@@ -1,7 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const escribir = require('./editartext')
+
 const app = express();
 
 // Configurar middleware para permitir CORS
@@ -44,6 +44,33 @@ app.get('/ventas', (req, res) => {
     }
   });
 });
+
+app.get('/numeroCliente', (req, res) => {
+  // Query para seleccionar el máximo número de orden entre las tablas pedidos y ventas
+  const query = `
+    SELECT
+      GREATEST(
+        (SELECT MAX(numeroOrden) FROM pedidos),
+        (SELECT MAX(numeroOrden) FROM ventas)
+      ) AS mayorNumeroOrden
+  `;
+
+  // Ejecutar la consulta
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error('Error al obtener datos del número de cliente:', error);
+      res.status(500).json({ error: 'Error al obtener datos del número de cliente' });
+    } else {
+      // Acceder al resultado
+      const maxNumeroOrden = results[0] ? results[0].mayorNumeroOrden : null;
+
+      // Enviar el resultado como respuesta
+      res.status(200).json({ maxNumeroOrden });
+    }
+  });
+});
+
+
 
 app.get('/combos', (req, res) => {
   // Query para seleccionar todos los datos del menú
@@ -247,74 +274,6 @@ app.put('/actualizar-stockG', (req, res) => {
   });
 });
 
-
-app.post('/insertar-pedido', (req, res) => {
-  const { OrdenTxt, Cantidad, Llaves, Comentario, Precio, Estado, Barra, Cliente, NumOrden } = req.body;
-  const query = `INSERT INTO Pedidos (OrdenTxt, Cantidad, Llaves, Comentario, Precio, Estado, Barra, Cliente, NumOrden) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  db.query(query, [OrdenTxt, Cantidad, Llaves, Comentario, Precio, Estado, Barra, Cliente, NumOrden], (error, results) => {
-    if (error) {
-      console.error('Error al insertar en la base de datos:', error);
-      res.status(500).json({ error: 'Error al insertar en la base de datos' });
-    } else {
-      res.status(200).json({ message: 'Datos insertados correctamente' });
-    }
-  });
-});
-
-
-app.get('/obtener-pedidos', (req, res) => {
-  const query = `SELECT Id_pedidos, OrdenTxt, Cantidad, Llaves, Comentario, Precio, Estado, Barra, Cliente, NumOrden FROM Pedidos`;
-  db.query(query, (error, results) => {
-    if (error) {
-      console.error('Error al obtener los pedidos:', error);
-      res.status(500).json({ error: 'Error al obtener los pedidos' });
-    } else {
-      res.status(200).json(results);
-    }
-  });
-});
-
-app.delete('/eliminar-pedidos-barra', (req, res) => {
-  const { barra } = req.body; // Se asume que el valor de 'barra' se encuentra en el cuerpo de la solicitud
-
-  // Query SQL para eliminar pedidos con la barra proporcionada
-  const query = 'DELETE FROM Pedidos WHERE Barra = ?';
-
-  // Ejecutar la consulta SQL
-  db.query(query, [barra], (error, results) => {
-    if (error) {
-      console.error('Error al eliminar pedidos en la base de datos:', error);
-      res.status(500).json({ error: 'Error al eliminar pedidos en la base de datos' });
-    } else {
-      res.status(200).json({ message: 'Pedidos eliminados correctamente' });
-    }
-  });
-});
-
-app.put('/actualizar-estado/:barra', (req, res) => {
-  const { barra } = req.params;
-
-  // Verificar si se proporciona el valor del estado en el cuerpo de la solicitud
-  const { estado } = req.body;
-  if (estado === undefined) {
-    return res.status(400).json({ error: 'El parámetro estado es obligatorio' });
-  }
-
-  // Query de actualización con parámetros
-  const sql = "UPDATE `Pedidos` SET `Estado` = ? WHERE `Pedidos`.`Barra` = ?";
-
-  // Ejecutar la consulta en la base de datos utilizando db.query con los parámetros
-  db.query(sql, [estado, barra], (err, result) => {
-    if (err) {
-      console.error('Error al ejecutar la consulta:', err);
-      res.status(500).json({ error: 'Error al actualizar el estado' });
-    } else {
-      console.log('Estado actualizado correctamente');
-      res.status(200).json({ message: 'Estado actualizado correctamente' });
-    }
-  });
-});
-
 app.post('/insertar-venta', (req, res) => {
   const { Estado, Pedido, Cantidad, Comentario, Precio, NumeroOrden } = req.body;
 
@@ -435,6 +394,18 @@ app.get('/preciosColaciones', (req, res) => {
   const query = `SELECT * FROM precios_colaciones`;
   db.query(query, (error, results) => {
     if (error) {
+      console.error('Error al obtener los preciosColaciones:', error);
+      res.status(500).json({ error: 'Error al obtener los preciosColaciones' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+app.get('/pedidos', (req, res) => {
+  const query = `SELECT * FROM pedidos`;
+  db.query(query, (error, results) => {
+    if (error) {
       console.error('Error al obtener los pedidos:', error);
       res.status(500).json({ error: 'Error al obtener los pedidos' });
     } else {
@@ -442,6 +413,103 @@ app.get('/preciosColaciones', (req, res) => {
     }
   });
 });
+
+
+app.post('/insertar-pedido', (req, res) => {
+  const { OrdenTxt, Cantidad, Llaves, Comentario, Precio, Estado, Barra, Cliente, NumOrden } = req.body;
+  const query = `INSERT INTO Pedidos (OrdenTxt, Cantidad, Llaves, Comentario, Precio, Estado, Barra, Cliente, NumOrden) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  db.query(query, [OrdenTxt, Cantidad, Llaves, Comentario, Precio, Estado, Barra, Cliente, NumOrden], (error, results) => {
+    if (error) {
+      console.error('Error al insertar en la base de datos:', error);
+      res.status(500).json({ error: 'Error al insertar en la base de datos' });
+    } else {
+      res.status(200).json({ message: 'Datos insertados correctamente' });
+    }
+  });
+});
+
+app.post('/Subirpedidos', (req, res) => {
+  const { barra, cantidad, cliente, comentario, estado, numeroOrden, precio, precioUnitario, stringSelecteDataId, textoOrden } = req.body;
+
+  const query = `INSERT INTO pedidos (barra, cantidad, cliente, comentario, estado, numeroOrden, precio, precioUnitario, stringSelecteDataId, textoOrden) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  const values = [barra, cantidad, cliente, comentario, estado, numeroOrden, precio, precioUnitario, stringSelecteDataId, textoOrden];
+
+  db.query(query, values, (err, results) => {
+    if (err) {
+      console.error('Error inserting data:', err);
+      res.status(500).send('Error inserting data');
+      return;
+    }
+    res.status(201).send('Data inserted successfully');
+  });
+});
+
+app.delete('/quitar-pedido', (req, res) => {
+  const { barra } = req.body;
+  const query = `DELETE FROM pedidos WHERE barra = ?`;
+  db.query(query, [barra], (error, results) => {
+    if (error) {
+      console.error('Error al eliminar en la base de datos:', error);
+      res.status(500).json({ error: 'Error al eliminar en la base de datos' });
+    } else {
+      res.status(200).json({ message: 'Datos eliminados correctamente' });
+    }
+  });
+});
+
+
+app.put('/actualizar-stock-global', (req, res) => {
+  // Query para actualizar stockG en la tabla menu
+  const sql = `
+    UPDATE menu
+    JOIN (
+        SELECT id_menu, SUM(stockD) AS total_stockD
+        FROM semana
+        GROUP BY id_menu
+    ) AS suma_stock
+    ON menu.id = suma_stock.id_menu
+    SET menu.stockG = suma_stock.total_stockD;
+  `;
+
+  // Ejecutar la consulta en la base de datos utilizando db.query
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Error al ejecutar la consulta:', err);
+      res.status(500).json({ error: 'Error al actualizar el stock global' });
+    } else {
+      console.log('Stock global actualizado correctamente');
+      res.status(200).json({ message: 'Stock global actualizado correctamente' });
+    }
+  });
+});
+
+app.put('/actualizar-estado', (req, res) => {
+  const { barra, nuevoEstado } = req.body;
+
+  // Validar la entrada
+  if (!barra || nuevoEstado === undefined) {
+    return res.status(400).json({ message: 'Faltan datos necesarios' });
+  }
+
+  // Consulta SQL para actualizar el estado
+  const query = 'UPDATE pedidos SET estado = ? WHERE barra = ?';
+
+  db.query(query, [nuevoEstado, barra], (err, results) => {
+    if (err) {
+      console.error('Error al actualizar el estado:', err);
+      return res.status(500).json({ message: 'Error en la actualización' });
+    }
+
+    if (results.affectedRows > 0) {
+      res.status(200).json({ message: 'Estado actualizado correctamente' });
+    } else {
+      res.status(404).json({ message: 'No se encontró ningún pedido con ese código de barra' });
+    }
+  });
+});
+
+
 
 
 // Escuchar en un puerto específico

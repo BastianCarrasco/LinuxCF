@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 import { actualizarMenu } from '../Consultas/UPDATE/editarStockG';
 
-export default function DatosIngresados({ onInsertSuccess }) {
+export default function DatosIngresados({ onInsertSuccess, setTodoOculto  }) {
   const [datosMenu, setDatosMenu] = useState([]);
   const [datosModificados, setDatosModificados] = useState([]);
   const [filtroTipo, setFiltroTipo] = useState(null); // Estado para almacenar el tipo seleccionado
@@ -36,11 +36,6 @@ export default function DatosIngresados({ onInsertSuccess }) {
     setDatosModificados(nuevosDatos);
   };
 
-  // Función para mostrar los datos modificados por consola
-  const mostrarDatosModificados = () => {
-    console.log('Datos modificados:');
-    console.log(datosModificados);
-  };
 
   // Función para actualizar todos los datos modificados
   const actualizarTodosLosDatos = async () => {
@@ -68,18 +63,22 @@ export default function DatosIngresados({ onInsertSuccess }) {
   // Función para alternar la visibilidad de la tabla
   const toggleTablaVisible = () => {
     setTablaVisible(!tablaVisible);
+
+    if(!tablaVisible){
+      setTodoOculto(true);
+    }else  setTodoOculto(false);
   };
 
   return (
     <div className="w-1/2 bg-black p-4 rounded shadow-md border-white">
        <div className="bg-black">
-        
-        <button onClick={toggleTablaVisible} className="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">
+
+        <button style={{fontSize:"20px"}} onClick={toggleTablaVisible} className="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">
           {tablaVisible ? 'Cerrar' : 'Editar Stock/Nombre/Precio'}
         </button>
-        
+
         {tablaVisible && (
-            
+
           <div className="overflow-x-auto">
             <div className="flex space-x-4 mb-4">
           <button onClick={() => filtrarPorTipo(5)} className="text-white hover:underline">Bebidas</button>
@@ -146,14 +145,13 @@ export default function DatosIngresados({ onInsertSuccess }) {
       </div>
       {tablaVisible && (
         <div className="flex justify-end mt-4">
-          
+
           <button onClick={actualizarTodosLosDatos} className="bg-green-500 text-white font-bold py-2 px-4 rounded">
             Actualizar Todos los Datos
           </button>
-          
+
         </div>
       )}
     </div>
   );
 }
-

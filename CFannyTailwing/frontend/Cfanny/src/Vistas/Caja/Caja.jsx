@@ -8,8 +8,19 @@ import { obtenerDatosTiposMenu } from '../Consultas/GET/gettiposMenu';
 import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 import { textoOrden } from './TextoOrden';
 import { generarNumeroUnico } from './Barra';
+import Boleta from './boleta';
+import { FaArrowRotateLeft } from "react-icons/fa6";
+import { numeroCliente } from '../Consultas/GET/numeroCliente';
+import { useFetcher } from 'react-router-dom';
+
 
 const Caja = () => {
+  const [isBoletaOpen, setIsBoletaOpen] = useState(false);
+  const [filter, setFilter] = useState(localStorage.getItem('filter') || ""); // Inicializa el estado del filtro desde localStorage
+  const [showInput, setShowInput] = useState(false);
+  const handleOpenBoleta = () => setIsBoletaOpen(true);
+  const handleCloseBoleta = () => setIsBoletaOpen(false);
+  const [precioTotal, setprecioTota] = useState(0);
   const [barra, setBarra] = useState(0);
   const [numeroOrden, setNumeroOrden] = useState(0);
   const [Texto, setTexto] = useState('');
@@ -20,6 +31,10 @@ const Caja = () => {
   const [Combos, setCombos] = useState([]);
   const [Tipos, setTipos] = useState([]);
   const [precio, setPrecio] = useState(0);
+
+
+  const [comentarionuevo, setcomentarionuevo] = useState(localStorage.getItem('comentarionuevo') || ""); // Inicializa el estado del filtro desde localStorage
+
   const [contadorTipos, setContadorTipos] = useState({
     proteina: 0,
     acompana: 0,
@@ -36,16 +51,99 @@ const Caja = () => {
   const [lista, setLista] = useState({
     stringSelecteDataId: '',
     textoOrden: Texto,
-    comentario: '',
+    comentario: comentarionuevo,
     precio: 0,
     cantidad: 0,
     numeroOrden: 0,
     barra: 0,
     estado: 0,
-    cliente: '',
+    cliente: null,
   });
 
-  const [ListaMayor, setListaMayor] = useState([]);
+  const fetchNumeroCliente = async () => {
+    try {
+      const response = await numeroCliente();
+      const maxNumeroOrden = response.maxNumeroOrden; // Suponiendo que la respuesta tiene la propiedad 'maxNumeroOrden'
+      setNumeroOrden(parseInt(maxNumeroOrden, 10)+1); // Convierte a entero
+      console.log(maxNumeroOrden + "dcacawcac");
+    } catch (error) {
+      console.error('Error al obtener el número de cliente:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNumeroCliente();
+  }, []);
+
+
+
+
+
+
+  function verBarra() {
+    if (showInput === false) {
+      setShowInput(true);
+    }
+    else setShowInput(false);
+  };
+
+  const clearComentario = () => {
+    setcomentarionuevo(""); // Limpia el estado del filtro
+    localStorage.removeItem('comentarionuevo'); // Elimina el valor de localStorage
+  };
+
+
+  const handlecomentarionuevoChange = (e) => {
+    const value = e.target.value;
+    setcomentarionuevo(value); // Actualiza el estado del filtro
+    localStorage.setItem('comentarionuevo', value); // Guarda el filtro en localStorage
+  };
+
+
+
+
+
+
+  const clearFilter = () => {
+    setFilter(""); // Limpia el estado del filtro
+    localStorage.removeItem('filter'); // Elimina el valor de localStorage
+  };
+
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setFilter(value); // Actualiza el estado del filtro
+    localStorage.setItem('filter', value); // Guarda el filtro en localStorage
+  };
+
+  const [ListaMayor, setListaMayor] = useState(JSON.parse(localStorage.getItem('ListaMayor')) || []);
+
+  const removeLastItem = () => {
+    setSelectedData((prevData) => prevData.slice(0, -1));
+  };
+
+
+
+  useEffect(() => {
+    localStorage.setItem('ListaMayor', JSON.stringify(ListaMayor));
+    console.log(ListaMayor);
+    let suma = 0;
+    ListaMayor.forEach(element => {
+      suma = suma + element.precio;
+    });
+    setprecioTota(suma);
+    console.log("PRECIO TOTAL " + precioTotal);
+  }, [ListaMayor]);
+
+  const borrarListaMayor = () => {
+    setListaMayor([]);
+    localStorage.setItem('ListaMayor', JSON.stringify([]));
+    console.log('ListaMayor vacía:', ListaMayor);
+    clearComentario();
+    clearFilter();
+    setTexto("ORDEN");
+    setPrecio(0);
+  };
 
 
   const eliminarFila = (index) => {
@@ -83,6 +181,39 @@ const Caja = () => {
   };
 
 
+  useEffect(() => {
+    const filteredData = selectedData.filter((item) => {
+      const tiposValidos = [4, 5, 7, 8, 9];
+      const nombresNoPermitidos = ['Jalea', 'Pebre', 'Flan'];
+
+      // Filtrar los datos por tipo válido y nombres no permitidos
+      return tiposValidos.includes(item.tipo) && !nombresNoPermitidos.includes(item.nombre);
+    });
+
+    if (filteredData.length > 0) {
+
+
+      const nuevaLista = filteredData.map((item) => ({
+        stringSelecteDataId: (item.id).toString(),
+        textoOrden: item.nombre,
+        comentario: comentarionuevo,
+        precio: item.precio,
+        precioUnitario: item.precio,
+        cantidad: 1,
+        numeroOrden: numeroOrden.toString(),
+        barra: barra,
+        estado: 0,
+        cliente: null,
+      }));
+
+      setListaMayor([...ListaMayor, ...nuevaLista]);
+      setSelectedData([]);
+      console.log('Orden agregada:', ListaMayor);
+    }
+  }, [selectedData]);
+
+
+
 
 
   useEffect(() => {
@@ -112,8 +243,12 @@ const Caja = () => {
 
     setContadorTipos(contador);
 
-    console.log('Contador de tipos:', contadorTipos);
+
   }, [selectedData, Tipos]);
+
+  useEffect(()=>{
+    console.log('Contador de tipos:', contadorTipos);
+  },[selectedData]);
 
   useEffect(() => {
     const combo = Combos.find(
@@ -146,7 +281,15 @@ const Caja = () => {
       const now = new Date();
       setCurrentDate(now);
       const dayNames = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
-      setDayName(dayNames[now.getDay()]);
+      // Obtén el nombre del día actual
+      let dayName = dayNames[now.getDay()];
+
+      // Ajusta el nombre del día si es domingo
+      if (dayName === 'DOMINGO') {
+        dayName = 'LUNES';
+      }
+
+      setDayName(dayName);
     };
 
     updateDateTime();
@@ -160,6 +303,8 @@ const Caja = () => {
       try {
         if (dayName) {
           const datos = await obtenerDatosSemana();
+
+
           setDatosSemana(datos.filter((dato) => dato.dia === dayName));
         }
 
@@ -220,59 +365,151 @@ const Caja = () => {
     }
   };
 
-  const handleAgregarOrden = () => {
-    const stringSelecteDataId = selectedData.map((item) => item.id).join('-');
-    const nuevaLista = {
-      ...lista,
-      stringSelecteDataId,
-      textoOrden: Texto,
-      precio: precio, // Guardar el precio total
-      precioUnitario: precio, // Guardar el precio unitario
-      cantidad: 1, // Inicialmente la cantidad es 1
-      numeroOrden,
-      barra,
-    };
 
-    setListaMayor([...ListaMayor, nuevaLista]);
-    setSelectedData([]);
-    console.log('Orden agregada:', nuevaLista);
+
+  const handleAgregarOrden = () => {
+
+    if (selectedData.length > 0) {
+      const stringSelecteDataId = selectedData.map((item) => item.id).join('-');
+      const nuevaLista = {
+        ...lista,
+        stringSelecteDataId,
+        textoOrden: Texto,
+        precio: precio, // Guardar el precio total
+        precioUnitario: precio, // Guardar el precio unitario
+        cantidad: 1, // Inicialmente la cantidad es 1
+        numeroOrden: numeroOrden.toString(),
+        comentario: comentarionuevo,
+        barra,
+      };
+      setListaMayor([...ListaMayor, nuevaLista]);
+      setSelectedData([]);
+      console.log('Orden agregada:', nuevaLista);
+      clearComentario();
+
+
+    }
   };
 
 
 
   return (
-    <div className="flex flex-row w-full min-h-screen">
-      <div className="w-2/6 p-4">
-        <div>
-          <p style={{ fontSize: '24px', marginTop: '50px', color: 'white' }}>
-            NUMERO: {numeroOrden} BARRA: {barra}
-          </p>
-          <br />
-          <p style={{ fontSize: '24px', color: 'white' }}>
-            {Texto} : ${precio}{' '}
-          </p>
+    <div className="flex flex-col w-full min-h-screen">
+      <div className="w-full p-4">
+
+        {/* TOP */}
+        <div style={{ border: "solid" }} className="flex justify-between">
+          <div style={{ marginTop: "40px" }} className="w-1/2">
+            <div className="flex items-center justify-between">
+              <button style={{ fontSize: "24px" }} onClick={borrarListaMayor} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
+                Cancelar
+              </button>
+              <p style={{ fontSize: '24px', color: 'white' }}>
+                NUMERO: {numeroOrden}
+              </p>
+
+
+
+            </div>
+
+            <div className="flex border p-4">
+
+              <div className="flex-1 flex items-center">
+                <p style={{ fontSize: '24px', color: 'white' }}>
+                  {Texto} : ${precio}
+                </p>
+
+
+              </div>
+
+              <button style={{ fontSize: "24px" }} onClick={removeLastItem} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+                <FaArrowRotateLeft />
+              </button>
+            </div>
+            <div>
+              <p style={{ fontSize: '24px', color: 'white' }}>
+                COMENTARIO:
+              </p>  <input
+                type="text"
+                value={comentarionuevo}
+                onChange={handlecomentarionuevoChange}
+                placeholder="Ingresar comentaio"
+                className="mb-4 p-2 border border-gray-300 rounded"
+                style={{ fontSize: "18px", color: "black" }}
+              />
+            </div>
+
+
+            <ButtonList datosSemana={datosSemana} handleSelectData={handleSelectData} />
+          </div>
+
+
+          <div className="w-1/2 flex flex-col ">
+            <DateTimeDisplay dayName={dayName} currentDate={currentDate} />
+            <button style={{ fontSize: "24px" }} onClick={handleAgregarOrden} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+              Agregar Orden
+            </button><br></br>
+            <button
+              type="button"
+              className="bg-orange-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+              onClick={handleOpenBoleta}
+              style={{ fontSize: "24px" }}
+            >
+              Crear Orden
+            </button><br></br>
+
+            <button
+              type="button"
+              className="bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+              onClick={verBarra}
+              style={{ fontSize: "24px" }}
+            >
+              Crear Pedido
+            </button>
+
+            {showInput && (
+              <input
+                type="text"
+                value={filter}
+                onChange={handleInputChange}
+                placeholder="Ingresar ID de nueve dígitos..."
+                className="mb-4 p-2 border border-gray-300 rounded"
+                style={{ fontSize: "18px", color: "black" }}
+              />
+            )}
+
+            <Boleta
+              ListaMayor={ListaMayor}
+              isOpen={isBoletaOpen}
+              onClose={handleCloseBoleta}
+              precioTotal={precioTotal}
+              borrar={borrarListaMayor}
+              barra={barra}
+              filter={filter}
+              clearFilter={clearFilter}
+              aumentarCliente={fetchNumeroCliente}
+            />
+            <p style={{ fontSize: '30px', marginTop: '50px', color: 'white' }}>
+              TOTAL:  $ {precioTotal}
+            </p>
+          </div>
         </div>
 
-        <ButtonList datosSemana={datosSemana} handleSelectData={handleSelectData} />
-        <button onClick={handleAgregarOrden} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-          Agregar Orden
-        </button>
-      </div>
-      <div className="w-4/6 flex flex-col items-center justify-center">
-        <h2 className="text-3xl font-bold">Caja</h2>
-        <DateTimeDisplay dayName={dayName} currentDate={currentDate} />
-        <p>Nombre del día: {dayName}</p>
-        <SelectedDataTable
-          ListaMayor={ListaMayor}
-          incrementarCantidad={incrementarCantidad}
-          decrementarCantidad={decrementarCantidad}
-          eliminarFila={eliminarFila}
-          toggleComentario={toggleComentario}
-        />
+        {/* BOTTOM */}
+        <div className="mt-4">
+          <SelectedDataTable
+            ListaMayor={ListaMayor}
+            incrementarCantidad={incrementarCantidad}
+            decrementarCantidad={decrementarCantidad}
+            eliminarFila={eliminarFila}
+            toggleComentario={toggleComentario}
+          />
+        </div>
 
-        <p>HOLA: {precio}</p>
       </div>
     </div>
+
+
   );
 };
 

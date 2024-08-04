@@ -1,18 +1,29 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default function Navbar() {
+export default function Navbar({ user }) {
   return (
     <nav className="bg-gray-800 text-white fixed top-0 left-0 w-full p-4 flex justify-between items-center">
       <h1 className="text-xl">Colaciones Fanny</h1>
-      <div className="flex justify-around flex-1">
-        <a href="/" className="hover:underline mx-4">Home</a>
-        <a href="/caja" className="hover:underline mx-4">Caja</a>
-        <a href="/cola" className="hover:underline mx-4">Cola</a>
-        <a href="/encargo" className="hover:underline mx-4">Encargos</a>
-        <a href="/semana" className="hover:underline mx-4">Semana</a>
-        <a href="/stock" className="hover:underline mx-4">Stock</a>
-        <a href="/ventas" className="hover:underline mx-4">Ventas</a>
-        {/* Agrega otros enlaces aquí */}
+      <div style={{fontSize:"24px"}} className="flex justify-around flex-1">
+        <Link to="/" className="hover:underline mx-4">Home</Link>
+        {user === 'Eduardo' && (
+          <>
+            <Link to="/caja" className="hover:underline mx-4">Caja</Link>
+            <Link to="/cola" className="hover:underline mx-4">Cola</Link>
+            <Link to="/encargo" className="hover:underline mx-4">Encargos</Link>
+            <Link to="/semana" className="hover:underline mx-4">Semana</Link>
+            <Link to="/stock" className="hover:underline mx-4">Stock</Link>
+            <Link to="/ventas" className="hover:underline mx-4">Ventas</Link>
+          </>
+        )}
+        {user === 'Tablet' && (
+          <>
+            <Link to="/caja" className="hover:underline mx-4">Caja</Link>
+            <Link to="/cola" className="hover:underline mx-4">Cola</Link>
+            <Link to="/encargo" className="hover:underline mx-4">Encargos</Link>
+          </>
+        )}
       </div>
     </nav>
   );

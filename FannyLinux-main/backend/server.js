@@ -1,7 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const escribir = require('./editartext')
+
 const app = express();
 
 // Configurar middleware para permitir CORS
@@ -247,7 +247,7 @@ app.get('/obtener-pedidos', (req, res) => {
 
 app.delete('/eliminar-pedidos-barra', (req, res) => {
   const { barra } = req.body; // Se asume que el valor de 'barra' se encuentra en el cuerpo de la solicitud
-  
+
   // Query SQL para eliminar pedidos con la barra proporcionada
   const query = 'DELETE FROM Pedidos WHERE Barra = ?';
 
@@ -347,12 +347,22 @@ app.get('/preciosColaciones', (req, res) => {
   });
 });
 
+app.delete('/quitar-pedido', (req, res) => {
+  const { barra } = req.body;
+  const query = `DELETE FROM pedidos WHERE barra = ?`;
+  db.query(query, [barra], (error, results) => {
+    if (error) {
+      console.error('Error al eliminar en la base de datos:', error);
+      res.status(500).json({ error: 'Error al eliminar en la base de datos' });
+    } else {
+      res.status(200).json({ message: 'Datos eliminados correctamente' });
+    }
+  });
+});
+
 
 // Escuchar en un puerto específico
 const PORT = process.env.PORT || 5150;
 app.listen(PORT, () => {
   console.log(`Servidor backend escuchando en el puerto ${PORT}`);
 });
-
-
-
