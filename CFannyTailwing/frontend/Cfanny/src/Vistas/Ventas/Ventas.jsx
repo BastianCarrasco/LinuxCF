@@ -3,7 +3,6 @@ import { obtenerVentas } from "../Consultas/GET/getVentas";
 
 export default function Ventas() {
   const [ventas, setVentas] = useState([]);
-  const [filter, setFilter] = useState(""); // Estado para el valor del filtro
 
   // Función para obtener y establecer los datos de ventas
   const fetchVentas = async () => {
@@ -47,7 +46,7 @@ export default function Ventas() {
     ventas.forEach(venta => {
       if (venta.cliente === 'Caja') {
         clientCounts.Caja += 1;
-      } else if (venta.cliente === 'Encargos') {
+      } else {
         clientCounts.Encargos += 1;
       }
     });
@@ -161,7 +160,7 @@ export default function Ventas() {
           <span className="text-xl font-bold">Pedidos por Mes:</span>
           <ul className="text-xl text-white-700">
             {Object.entries(countOrdersByMonth()).map(([month, count], index) => (
-              <li key={index}>{month} - {count} pedidos</li>
+              <li key={index}>{month} - {count} pedidos}</li>
             ))}
           </ul>
         </div>
@@ -196,11 +195,13 @@ export default function Ventas() {
               {ventas.map((venta, index) => (
                 <tr key={index}>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.numeroOrden}</td>
-                  <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.cliente || 'Caja'}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">
+  {venta.cliente === 'Caja' ? 'Caja' : 'Encargo'}
+</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.textoOrden}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.cantidad}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.comentario}</td>
-                  <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.precio}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">${venta.precio}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{formatDate(venta.fechaVenta)}</td>
                 </tr>
               ))}

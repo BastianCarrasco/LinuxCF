@@ -33,7 +33,7 @@ const Boleta = ({ ListaMayor, isOpen, onClose, precioTotal, borrar, barra, filte
         pedido.barra,
         pedido.cantidad,
         pedido.cliente,
-        pedido.comentario,
+        pedido.comentario || '',
         pedido.estado,
         pedido.numeroOrden,
         pedido.precio,
@@ -82,16 +82,16 @@ const Boleta = ({ ListaMayor, isOpen, onClose, precioTotal, borrar, barra, filte
     // Agregar cada elemento del arreglo al contenido del PDF
     ListaMayor.forEach((pedido) => {
       // Verificar si el número de orden es diferente al pedido anterior
-      if (pedido.NumOrden !== previousNumOrden) {
+      if (pedido.numeroOrden !== previousNumOrden) {
         doc.setFontSize(fontSizeNumOrden); // Establecer el tamaño de fuente para el número de orden
-        content += `Número de Orden: ${pedido.NumOrden}\n`;
-        previousNumOrden = pedido.NumOrden;
+        content += `Número de Orden: ${pedido.numeroOrden}\n`;
+        previousNumOrden = pedido.numeroOrden;
       }
 
       // Establecer el tamaño de fuente para el resto del contenido
       doc.setFontSize(fontSizeResto);
 
-      content += `Orden: ${pedido.textoOrden}\nCantidad: ${pedido.cantidad}\nComentario: ${pedido.Comentario}\nPrecio: ${pedido.precio}\n`;
+      content += `Orden: ${pedido.textoOrden}\nCantidad: ${pedido.cantidad}\nComentario: ${pedido.Comentario || ''}\nPrecio: ${pedido.precio}\n`;
 
       // Sumar el precio al total
       totalPrice += parseFloat(pedido.precio);
