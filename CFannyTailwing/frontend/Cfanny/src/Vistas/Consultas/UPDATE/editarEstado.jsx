@@ -2,10 +2,10 @@ import axios from 'axios';
 import { link } from '../servidor';
 
 // Función para actualizar el estado de un pedido a 1
-export const actualizarEstadoPedido = async (barra) => {
+export const actualizarEstadoPedido = async (barra, nuevoEstado) => {
   try {
     // Establece el nuevo estado a 1
-    const nuevoEstado = 1;
+    
 
     // Realiza la solicitud PUT al servidor con el código de barra y el nuevo estado
     const response = await axios.put(`http://${link}:5150/actualizar-estado`, {

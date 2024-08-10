@@ -1,10 +1,27 @@
 import { useEffect, useState } from "react";
 import { obtenerDatosPedidos } from "../Consultas/GET/getPedidos";
 import { eliminarPedido } from "../Consultas/DELETE/eliminarPedido";
+import { ImFire } from "react-icons/im";
 
-export default function Encargos() {
+export default function Cola() {
   const [pedidos, setPedidos] = useState([]);
   const [filter, setFilter] = useState(""); // Estado para el valor del filtro
+
+  const rojos = [31, 32, 43, 44, 45, 77, 78, 79, 80]; // Números rojos
+
+  useEffect(() => {
+    pedidos.forEach(element => {
+      const partes = element.stringSelecteDataId.split('-');
+
+      // Convertir las partes en enteros y comprobar si alguna está en rojos
+      const contieneRojo = partes.some(parte => rojos.includes(parseInt(parte)));
+
+      // Si contiene al menos un número rojo, retornar el elemento
+      if (contieneRojo) {
+        console.log("Elemento con rojo encontrado:", element);
+      }
+    });
+  }, [pedidos]);
 
   // Función para obtener y establecer los datos de pedidos
   const fetchPedidos = async () => {
@@ -44,7 +61,6 @@ export default function Encargos() {
       const pedidosToDelete = pedidos.filter(pedido => pedido.barra === barra);
 
       if (pedidosToDelete.length === 0) {
-        console.log("No se encontraron pedidos con el código de barra proporcionado.");
         return;
       }
 
@@ -57,18 +73,57 @@ export default function Encargos() {
       const updatedPedidos = pedidos.filter(pedido => pedido.barra !== barra);
       setPedidos(updatedPedidos);
 
-      console.log("Pedidos eliminados:", pedidosToDelete);
     } catch (error) {
       console.error('Error al eliminar pedidos:', error);
     }
   };
 
-  // Filtra los pedidos para mostrar solo los que tienen cliente no vacío
-  const filteredPedidos = pedidos.filter(pedido => pedido.cliente === null || (pedido.clente!==null && pedido.estado===1) );
+  // Filtra los pedidos para mostrar solo los que tienen estado 1 o 0
+  const filteredPedidos = pedidos.filter(pedido => pedido.estado === 1 || pedido.estado === 0);
+
+  // Función para agrupar los pedidos y calcular el rowSpan
+  const mergeOrders = (pedidos) => {
+    const mergedPedidos = [];
+    let currentOrder = null;
+    let rowSpan = 0;
+  
+    pedidos.forEach((pedido, index) => {
+      const partes = pedido.stringSelecteDataId.split('-');
+      const rojos = [31, 32, 43, 44, 45, 77, 78, 79, 80]; // Lista de IDs rojos
+      const contieneRojo = partes.some(parte => rojos.includes(parseInt(parte)));
+  
+      // Concatenar el ícono de fuego al final del texto si contiene un número rojo
+      const textoOrdenConIcono = (
+        <span>
+          {pedido.textoOrden} {contieneRojo && <ImFire style={{ color: 'red', display: 'inline-block', marginLeft: '50px', scale:'150%',marginRight: '-50px' }} />  }
+        </span>
+      );
+  
+      if (currentOrder && currentOrder.numeroOrden === pedido.numeroOrden) {
+        rowSpan++;
+        mergedPedidos.push({ ...pedido, rowSpan: 0, textoOrdenConIcono });
+      } else {
+        if (currentOrder) {
+          mergedPedidos[mergedPedidos.length - rowSpan - 1].rowSpan = rowSpan + 1;
+        }
+        currentOrder = pedido;
+        rowSpan = 0;
+        mergedPedidos.push({ ...pedido, rowSpan: 1, textoOrdenConIcono });
+      }
+    });
+  
+    if (currentOrder) {
+      mergedPedidos[mergedPedidos.length - rowSpan - 1].rowSpan = rowSpan + 1;
+    }
+  
+    return mergedPedidos;
+  };
+
+  const mergedPedidos = mergeOrders(filteredPedidos);
 
   return (
     <div className="w-full min-h-screen p-4 flex flex-col">
-      <h2 className="text-4xl font-bold mb-6">Encargos</h2>
+      <h2 className="text-4xl font-bold mb-6">Cola</h2>
 
       {/* Campo de entrada para ingresar el código de barra */}
       <input
@@ -77,14 +132,15 @@ export default function Encargos() {
         onChange={handleInputChange}
         placeholder="Ingresar ID de nueve dígitos..."
         className="mb-4 p-2 border border-gray-300 rounded"
-        style={{ fontSize: "18px", color:"black" }}
+        style={{ fontSize: "18px", color: "black" }}
       />
 
-      <div className="flex-1 overflow-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+      {/* Contenedor con scroll para la tabla */}
+      <div className="flex-1 overflow-y-auto">
+        <table style={{textAlign:'left'}} className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Número de Orden</th>
+              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">N</th>
               <th className="px-4 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Texto Orden</th>
               <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
               <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Comentario</th>
@@ -93,18 +149,21 @@ export default function Encargos() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredPedidos.map((pedido, index) => (
+            {mergedPedidos.map((pedido, index) => (
               <tr
                 key={index}
                 className={pedido.estado === 1 ? "bg-blue-500 text-white" : "bg-white-500 text-black"}
-
               >
-                <td className="px-2 py-4 whitespace-nowrap text-xl ">{pedido.numeroOrden}</td>
-                <td className="px-4 py-4 whitespace-nowrap text-xl ">{pedido.textoOrden}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl ">{pedido.cantidad}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl ">{pedido.comentario}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl "> $ {parseInt(pedido.precio, 10)}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-xl ">{pedido.barra}</td>
+                {pedido.rowSpan > 0 && (
+                  <td className="px-2 py-4 whitespace-nowrap text-xl" rowSpan={pedido.rowSpan}>
+                    {pedido.numeroOrden}
+                  </td>
+                )}
+                <td className="px-4 py-4 whitespace-nowrap text-xl">{pedido.textoOrdenConIcono}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-xl">{pedido.cantidad}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-xl">{pedido.comentario}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-xl">$ {parseInt(pedido.precio, 10)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-xl">{pedido.barra}</td>
               </tr>
             ))}
           </tbody>
@@ -113,3 +172,4 @@ export default function Encargos() {
     </div>
   );
 }
+

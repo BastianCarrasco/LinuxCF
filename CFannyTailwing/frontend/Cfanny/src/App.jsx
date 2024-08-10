@@ -54,7 +54,7 @@ function App() {
             <Route path="/ventas" element={hasAccess('Ventas') ? <Ventas /> : <Navigate to="/" />} />
           </Routes>
         </main>
-        <Footer />
+       
       </div>
     </Router>
   );

@@ -9,7 +9,6 @@ export default function Ventas() {
     try {
       const data = await obtenerVentas();
       setVentas(data); // Almacena los datos en el estado
-      console.log(ventas);
     } catch (error) {
       console.error('Error al obtener datos de las ventas:', error);
     }
@@ -44,15 +43,16 @@ export default function Ventas() {
     };
 
     ventas.forEach(venta => {
-      if (venta.cliente === 'Caja') {
+      if (venta.estado === 0) {
         clientCounts.Caja += 1;
-      } else {
+      } else if (venta.estado === 1) {
         clientCounts.Encargos += 1;
       }
     });
 
     return clientCounts;
   };
+  
 
   // Obtiene el top 10 de Texto Orden
   const getTop10TextoOrden = () => {
@@ -91,7 +91,7 @@ export default function Ventas() {
     const header = ['Número de Orden', 'Cliente', 'Texto Orden', 'Cantidad', 'Comentario', 'Precio', 'Fecha'];
     const rows = ventas.map(venta => [
       venta.numeroOrden,
-      venta.cliente || 'Caja',
+      venta.estado === 0 ? 'Caja' : venta.estado === 1 ? 'Encargo' : venta.estado === 5 ? 'Cancelado' : venta.estado === 3 ? 'Encargo en espera' : 'Desconocido',
       venta.textoOrden,
       venta.cantidad,
       venta.comentario,
@@ -119,7 +119,7 @@ export default function Ventas() {
   return (
     <div className="w-full min-h-screen p-4 flex flex-row">
       {/* Sección de resumen de ganancias totales */}
-      <div style={{ backgroundColor: "black" }} className="w-1/3 p-4 bg-gray-100 border-r border-gray-300">
+      <div style={{ backgroundColor: "black", textAlign:'left' }} className="w-1/3 p-4 bg-gray-100 border-r border-gray-300">
         <br /><br /><br />
 
         <div className="mb-4">
@@ -160,7 +160,7 @@ export default function Ventas() {
           <span className="text-xl font-bold">Pedidos por Mes:</span>
           <ul className="text-xl text-white-700">
             {Object.entries(countOrdersByMonth()).map(([month, count], index) => (
-              <li key={index}>{month} - {count} pedidos}</li>
+              <li key={index}>{month} - {count} pedidos</li>
             ))}
           </ul>
         </div>
@@ -196,8 +196,8 @@ export default function Ventas() {
                 <tr key={index}>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.numeroOrden}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">
-  {venta.cliente === 'Caja' ? 'Caja' : 'Encargo'}
-</td>
+                    {venta.estado === 0 ? 'Caja' : venta.estado === 1 ? 'Encargo' : venta.estado === 5 ? 'Cancelado' : venta.estado === 3 ? 'Encargo en espera' : 'Desconocido'}
+                  </td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.textoOrden}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.cantidad}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.comentario}</td>
@@ -212,3 +212,4 @@ export default function Ventas() {
     </div>
   );
 }
+

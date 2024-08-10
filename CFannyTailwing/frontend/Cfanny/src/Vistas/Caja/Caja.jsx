@@ -11,12 +11,16 @@ import { generarNumeroUnico } from './Barra';
 import Boleta from './boleta';
 import { FaArrowRotateLeft } from "react-icons/fa6";
 import { numeroCliente } from '../Consultas/GET/numeroCliente';
-import { useFetcher } from 'react-router-dom';
+import { handleAgregarOrden } from './agregarOrden';
+import { SiFireship } from "react-icons/si";
+
+
 
 
 const Caja = () => {
   const [isBoletaOpen, setIsBoletaOpen] = useState(false);
-  const [filter, setFilter] = useState(localStorage.getItem('filter') || ""); // Inicializa el estado del filtro desde localStorage
+  
+  const [Cliente, setCliente] = useState(localStorage.getItem('Cliente') || null); // Inicializa el estado del filtro desde localStorage
   const [showInput, setShowInput] = useState(false);
   const handleOpenBoleta = () => setIsBoletaOpen(true);
   const handleCloseBoleta = () => setIsBoletaOpen(false);
@@ -26,11 +30,38 @@ const Caja = () => {
   const [Texto, setTexto] = useState('');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dayName, setDayName] = useState('');
-  const [datosSemana, setDatosSemana] = useState([]);
+
   const [selectedData, setSelectedData] = useState([]);
   const [Combos, setCombos] = useState([]);
   const [Tipos, setTipos] = useState([]);
   const [precio, setPrecio] = useState(0);
+  const [estado, setestado] = useState(1);
+
+  const fetchNumeroCliente = async () => {
+    try {
+      const response = await numeroCliente();
+     // console.log('Datos obtenidos:', response);
+
+      // Asumiendo que la respuesta tiene la propiedad `total`
+      const total = response.total;
+      return Number(total); // Convertir a número explícitamente
+    } catch (error) {
+      console.error('Error al obtener el número de cliente:', error);
+      return 0; // Retorna 0 en caso de error
+    }
+  };
+
+  const fetchData = async () => {
+    const numero = await fetchNumeroCliente();
+    setNumeroOrden(numero + 1); // Asume que quieres incrementar el número en 1
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
+
 
 
   const [comentarionuevo, setcomentarionuevo] = useState(localStorage.getItem('comentarionuevo') || ""); // Inicializa el estado del filtro desde localStorage
@@ -60,26 +91,6 @@ const Caja = () => {
     cliente: null,
   });
 
-  const fetchNumeroCliente = async () => {
-    try {
-      const response = await numeroCliente();
-      const maxNumeroOrden = response.maxNumeroOrden; // Suponiendo que la respuesta tiene la propiedad 'maxNumeroOrden'
-      setNumeroOrden(parseInt(maxNumeroOrden, 10)+1); // Convierte a entero
-      console.log(maxNumeroOrden + "dcacawcac");
-    } catch (error) {
-      console.error('Error al obtener el número de cliente:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchNumeroCliente();
-  }, []);
-
-
-
-
-
-
   function verBarra() {
     if (showInput === false) {
       setShowInput(true);
@@ -99,50 +110,48 @@ const Caja = () => {
     localStorage.setItem('comentarionuevo', value); // Guarda el filtro en localStorage
   };
 
-
-
-
-
-
-  const clearFilter = () => {
-    setFilter(""); // Limpia el estado del filtro
-    localStorage.removeItem('filter'); // Elimina el valor de localStorage
+  const clearCliente = () => {
+    setCliente(""); // Limpia el estado del filtro
+    localStorage.removeItem('Cliente'); // Elimina el valor de localStorage
   };
 
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setFilter(value); // Actualiza el estado del filtro
-    localStorage.setItem('filter', value); // Guarda el filtro en localStorage
+    setCliente(value); // Actualiza el estado del filtro
+    localStorage.setItem('Cliente', value); // Guarda el filtro en localStorage
   };
 
   const [ListaMayor, setListaMayor] = useState(JSON.parse(localStorage.getItem('ListaMayor')) || []);
 
   const removeLastItem = () => {
     setSelectedData((prevData) => prevData.slice(0, -1));
+    
   };
 
 
 
   useEffect(() => {
     localStorage.setItem('ListaMayor', JSON.stringify(ListaMayor));
-    console.log(ListaMayor);
+   // console.log(ListaMayor);
     let suma = 0;
     ListaMayor.forEach(element => {
       suma = suma + element.precio;
     });
     setprecioTota(suma);
-    console.log("PRECIO TOTAL " + precioTotal);
+   // console.log("PRECIO TOTAL " + precioTotal);
   }, [ListaMayor]);
 
   const borrarListaMayor = () => {
     setListaMayor([]);
     localStorage.setItem('ListaMayor', JSON.stringify([]));
-    console.log('ListaMayor vacía:', ListaMayor);
+   // console.log('ListaMayor vacía:', ListaMayor);
     clearComentario();
-    clearFilter();
-    setTexto("ORDEN");
+    clearCliente();
+    setTexto();
     setPrecio(0);
+    fetchData();
+    setSelectedData([]);
   };
 
 
@@ -192,7 +201,6 @@ const Caja = () => {
 
     if (filteredData.length > 0) {
 
-
       const nuevaLista = filteredData.map((item) => ({
         stringSelecteDataId: (item.id).toString(),
         textoOrden: item.nombre,
@@ -208,9 +216,18 @@ const Caja = () => {
 
       setListaMayor([...ListaMayor, ...nuevaLista]);
       setSelectedData([]);
-      console.log('Orden agregada:', ListaMayor);
+     // console.log('Orden agregada:', ListaMayor);
+    }
+    else{
+      if (selectedData.length===1){
+        
+
+      }
     }
   }, [selectedData]);
+
+
+  
 
 
 
@@ -219,13 +236,13 @@ const Caja = () => {
   useEffect(() => {
     const concatenatedNames = textoOrden(selectedData);
     setTexto(concatenatedNames);
+    
   }, [selectedData]);
 
   useEffect(() => {
-    setTexto('ORDEN');
+  
     setPrecio(0);
-    setNumeroOrden(1);
-    setBarra(generarNumeroUnico);
+    
   }, []);
 
   useEffect(() => {
@@ -246,9 +263,7 @@ const Caja = () => {
 
   }, [selectedData, Tipos]);
 
-  useEffect(()=>{
-    console.log('Contador de tipos:', contadorTipos);
-  },[selectedData]);
+ 
 
   useEffect(() => {
     const combo = Combos.find(
@@ -265,14 +280,15 @@ const Caja = () => {
         combo.postre === (contadorTipos['postre'] || 0)
     );
 
-    console.log(combo);
+   // console.log(combo);
 
     if (combo) {
       setPrecio(combo.Precio);
-      console.log(`Precio encontrado: $${combo.Precio}`);
-    } else {
-      setPrecio(null);
-      console.log('No se encontró un precio coincidente');
+    //  console.log(`Precio encontrado: $${combo.Precio}`);
+    } 
+    else {
+      setPrecio(0);
+    //  console.log('No se encontró un precio coincidente');
     }
   }, [contadorTipos]);
 
@@ -298,27 +314,27 @@ const Caja = () => {
     return () => clearInterval(timerId);
   }, []);
 
-  useEffect(() => {
-    const fetchDatos = async () => {
-      try {
-        if (dayName) {
-          const datos = await obtenerDatosSemana();
+  // useEffect(() => {
+  //   const fetchDatos = async () => {
+  //     try {
+  //       if (dayName) {
+  //         const datos = await obtenerDatosSemana();
 
 
-          setDatosSemana(datos.filter((dato) => dato.dia === dayName));
-        }
+  //         setDatosSemana(datos.filter((dato) => dato.dia === dayName));
+  //       }
 
-        const data = await obtenerDatosMenu();
-        const tiposPermitidos = [5, 6, 7, 8, 9, 13, 14];
-        const filteredData = data.filter((item) => tiposPermitidos.includes(item.tipo));
-        setDatosSemana((prevDatosSemana) => [...prevDatosSemana, ...filteredData]);
-      } catch (error) {
-        console.error('Error al obtener datos:', error);
-      }
-    };
+  //       const data = await obtenerDatosMenu();
+  //       const tiposPermitidos = [5, 6, 7, 8, 9, 13, 14];
+  //       const filteredData = data.filter((item) => tiposPermitidos.includes(item.tipo));
+  //       setDatosSemana((prevDatosSemana) => [...prevDatosSemana, ...filteredData]);
+  //     } catch (error) {
+  //       console.error('Error al obtener datos:', error);
+  //     }
+  //   };
 
-    fetchDatos();
-  }, [dayName, obtenerDatosSemana, obtenerDatosMenu]);
+  //   fetchDatos();
+  // }, [dayName, obtenerDatosSemana, obtenerDatosMenu]);
 
   useEffect(() => {
     const fetchCombos = async () => {
@@ -347,50 +363,41 @@ const Caja = () => {
   }, []);
 
   const handleSelectData = (dato) => {
-    const tipo = dato.tipo;
-
     const countTipo1 = selectedData.filter((item) => item.tipo === 1).length;
     const countTipo10 = selectedData.filter((item) => item.tipo === 10).length;
     const countTipo2 = selectedData.filter((item) => item.tipo === 2).length;
-
-    if (
-      (tipo === 1 && countTipo1 === 0 && countTipo10 === 0) ||
-      (tipo === 10 && countTipo10 === 0 && countTipo1 === 0) ||
-      (tipo === 2 && countTipo2 < 2) ||
-      (tipo !== 1 && tipo !== 10 && tipo !== 2)
-    ) {
-      setSelectedData([...selectedData, dato]);
+  
+    // Restricciones
+    const maxTipo2 = 2;
+    const maxTipo1or10 = 1;
+  
+    if ((dato.tipo === 1 || dato.tipo === 10) && (countTipo1 + countTipo10 >= maxTipo1or10)) {
+      window.alert(`Solo se permite una PROTEINA o un GUISO por pedido/colacion.`);
+    } else if (dato.tipo === 2 && countTipo2 >= maxTipo2) {
+      window.alert(`Solo se permiten dos acompanamientos por pedido/colacion. .`);
     } else {
-      console.log('No cumple con la combinación permitida');
+      setSelectedData([...selectedData, dato]);
     }
   };
+  
+  
+  const agregarOrden = () => {
+    handleAgregarOrden({
+      selectedData,
+      lista,
+      Texto,
+      precio,
+      numeroOrden,
+      comentarionuevo,
+      barra,
+      ListaMayor,
+      setListaMayor,
+      clearComentario,
+      setSelectedData
+    });
 
-
-
-  const handleAgregarOrden = () => {
-
-    if (selectedData.length > 0) {
-      const stringSelecteDataId = selectedData.map((item) => item.id).join('-');
-      const nuevaLista = {
-        ...lista,
-        stringSelecteDataId,
-        textoOrden: Texto,
-        precio: precio, // Guardar el precio total
-        precioUnitario: precio, // Guardar el precio unitario
-        cantidad: 1, // Inicialmente la cantidad es 1
-        numeroOrden: numeroOrden.toString(),
-        comentario: comentarionuevo,
-        barra,
-      };
-      setListaMayor([...ListaMayor, nuevaLista]);
-      setSelectedData([]);
-      console.log('Orden agregada:', nuevaLista);
-      clearComentario();
-
-
-    }
+    setSelectedData([]);
   };
-
 
 
   return (
@@ -416,7 +423,7 @@ const Caja = () => {
 
               <div className="flex-1 flex items-center">
                 <p style={{ fontSize: '24px', color: 'white' }}>
-                  {Texto} : ${precio}
+                  ORDEN: {Texto} 
                 </p>
 
 
@@ -440,20 +447,20 @@ const Caja = () => {
             </div>
 
 
-            <ButtonList datosSemana={datosSemana} handleSelectData={handleSelectData} />
+            <ButtonList handleSelectData={handleSelectData} dayName={dayName} />
           </div>
 
 
           <div className="w-1/2 flex flex-col ">
             <DateTimeDisplay dayName={dayName} currentDate={currentDate} />
-            <button style={{ fontSize: "24px" }} onClick={handleAgregarOrden} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+            <button style={{ fontSize: "24px", maxWidth:'50%',marginLeft:'300px' }} onClick={agregarOrden} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
               Agregar Orden
             </button><br></br>
             <button
               type="button"
               className="bg-orange-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
               onClick={handleOpenBoleta}
-              style={{ fontSize: "24px" }}
+              style={{ fontSize: "24px", marginTop:'20px', maxWidth:'50%',marginLeft:'300px' }}
             >
               Crear Orden
             </button><br></br>
@@ -462,19 +469,21 @@ const Caja = () => {
               type="button"
               className="bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
               onClick={verBarra}
-              style={{ fontSize: "24px" }}
+              style={{ fontSize: "24px", marginTop:'20px',marginLeft:'300px', maxWidth:'50%' }}
             >
               Crear Pedido
             </button>
+            
 
             {showInput && (
+             
               <input
                 type="text"
-                value={filter}
+                value={Cliente}
                 onChange={handleInputChange}
-                placeholder="Ingresar ID de nueve dígitos..."
+                placeholder="INGRESE NOMBRE DE CLIENTE"
                 className="mb-4 p-2 border border-gray-300 rounded"
-                style={{ fontSize: "18px", color: "black" }}
+                style={{ fontSize: "18px", color: "black", marginTop:'10px', maxWidth:'50%', textAlign:'center',marginLeft:'300px' }}
               />
             )}
 
@@ -485,9 +494,12 @@ const Caja = () => {
               precioTotal={precioTotal}
               borrar={borrarListaMayor}
               barra={barra}
-              filter={filter}
-              clearFilter={clearFilter}
+              filter={Cliente}
+              clearFilter={clearCliente}
               aumentarCliente={fetchNumeroCliente}
+              estado={estado}
+              nombre={Cliente}
+              funcionboleta={generarNumeroUnico}
             />
             <p style={{ fontSize: '30px', marginTop: '50px', color: 'white' }}>
               TOTAL:  $ {precioTotal}

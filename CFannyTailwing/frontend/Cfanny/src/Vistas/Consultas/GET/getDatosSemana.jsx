@@ -5,7 +5,7 @@ import { link } from '../servidor';
 
 export const obtenerDatosSemana = async () => {
   try {
-    const response = await axios.get(`http://${link}:5150/datosSemana`);
+    const response = await axios.get(`http://${link}:5150/datossemana`);
     return response.data;
   } catch (error) {
     console.error('Error al obtener datos de la semana:', error);
