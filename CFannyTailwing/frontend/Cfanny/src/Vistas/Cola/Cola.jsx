@@ -1,75 +1,69 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { obtenerDatosPedidos } from "../Consultas/GET/getPedidos";
 import { eliminarPedido } from "../Consultas/DELETE/eliminarPedido";
 import { ImFire } from "react-icons/im";
 
 export default function Cola() {
   const [pedidos, setPedidos] = useState([]);
-  const [filter, setFilter] = useState(""); // Estado para el valor del filtro
-
-  const rojos = [31, 32, 43, 44, 45, 77, 78, 79, 80]; // Números rojos
+  const [filter, setFilter] = useState("");
+  const rojos = [31, 32, 43, 44, 45, 77, 78, 79, 80];
+  const inputRef = useRef(null); // Referencia al input
 
   useEffect(() => {
     pedidos.forEach(element => {
       const partes = element.stringSelecteDataId.split('-');
-
-      // Convertir las partes en enteros y comprobar si alguna está en rojos
       const contieneRojo = partes.some(parte => rojos.includes(parseInt(parte)));
-
-      // Si contiene al menos un número rojo, retornar el elemento
       if (contieneRojo) {
         console.log("Elemento con rojo encontrado:", element);
       }
     });
   }, [pedidos]);
 
-  // Función para obtener y establecer los datos de pedidos
   const fetchPedidos = async () => {
     try {
       const data = await obtenerDatosPedidos();
-      setPedidos(data); // Almacena los datos en el estado
+      setPedidos(data);
     } catch (error) {
       console.error('Error al obtener datos de los pedidos:', error);
     }
   };
 
   useEffect(() => {
-    fetchPedidos(); // Llama a la función para obtener los datos al cargar el componente
-
-    // Configura un intervalo para actualizar los pedidos cada 5 segundos
+    fetchPedidos();
     const intervalId = setInterval(fetchPedidos, 5000);
 
-    // Limpia el intervalo cuando el componente se desmonte
+    // Coloca el foco en el input cuando se carga la vista
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+
     return () => clearInterval(intervalId);
   }, []);
 
-  // Maneja el cambio en el campo de entrada
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setFilter(value); // Actualiza el estado del filtro
+    setFilter(value);
 
-    // Si el filtro tiene una longitud de 9 caracteres, intenta eliminar pedidos
     if (value.length === 9) {
-      handleDelete(value); // Llama a la función de eliminación
+      handleDelete(value);
+      setFilter("");
     }
+    
+    
   };
 
-  // Elimina los pedidos que coinciden con el filtro
   const handleDelete = async (barra) => {
     try {
-      // Filtra los pedidos a eliminar
       const pedidosToDelete = pedidos.filter(pedido => pedido.barra === barra);
 
       if (pedidosToDelete.length === 0) {
         return;
       }
 
-      // Elimina los pedidos
       for (const pedido of pedidosToDelete) {
         await eliminarPedido(parseInt(pedido.barra, 10));
       }
 
-      // Actualiza el estado para reflejar los cambios
       const updatedPedidos = pedidos.filter(pedido => pedido.barra !== barra);
       setPedidos(updatedPedidos);
 
@@ -78,27 +72,23 @@ export default function Cola() {
     }
   };
 
-  // Filtra los pedidos para mostrar solo los que tienen estado 1 o 0
   const filteredPedidos = pedidos.filter(pedido => pedido.estado === 1 || pedido.estado === 0);
 
-  // Función para agrupar los pedidos y calcular el rowSpan
   const mergeOrders = (pedidos) => {
     const mergedPedidos = [];
     let currentOrder = null;
     let rowSpan = 0;
-  
+
     pedidos.forEach((pedido, index) => {
       const partes = pedido.stringSelecteDataId.split('-');
-      const rojos = [31, 32, 43, 44, 45, 77, 78, 79, 80]; // Lista de IDs rojos
       const contieneRojo = partes.some(parte => rojos.includes(parseInt(parte)));
-  
-      // Concatenar el ícono de fuego al final del texto si contiene un número rojo
+
       const textoOrdenConIcono = (
         <span>
-          {pedido.textoOrden} {contieneRojo && <ImFire style={{ color: 'red', display: 'inline-block', marginLeft: '50px', scale:'150%',marginRight: '-50px' }} />  }
+          {pedido.textoOrden} {contieneRojo && <ImFire style={{ color: 'red', display: 'inline-block', marginLeft: '50px', scale:'150%',marginRight: '-50px' }} />}
         </span>
       );
-  
+
       if (currentOrder && currentOrder.numeroOrden === pedido.numeroOrden) {
         rowSpan++;
         mergedPedidos.push({ ...pedido, rowSpan: 0, textoOrdenConIcono });
@@ -111,11 +101,11 @@ export default function Cola() {
         mergedPedidos.push({ ...pedido, rowSpan: 1, textoOrdenConIcono });
       }
     });
-  
+
     if (currentOrder) {
       mergedPedidos[mergedPedidos.length - rowSpan - 1].rowSpan = rowSpan + 1;
     }
-  
+
     return mergedPedidos;
   };
 
@@ -131,45 +121,60 @@ export default function Cola() {
         value={filter}
         onChange={handleInputChange}
         placeholder="Ingresar ID de nueve dígitos..."
-        className="mb-4 p-2 border border-gray-300 rounded"
+        className="mb-4 p-2 border border-black-300 rounded"
         style={{ fontSize: "18px", color: "black" }}
+        ref={inputRef} // Asocia el input con la referencia
       />
 
       {/* Contenedor con scroll para la tabla */}
       <div className="flex-1 overflow-y-auto">
-        <table style={{textAlign:'left'}} className="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">N</th>
-              <th className="px-4 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Texto Orden</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Comentario</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-              <th className="px-6 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Barra</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {mergedPedidos.map((pedido, index) => (
-              <tr
-                key={index}
-                className={pedido.estado === 1 ? "bg-blue-500 text-white" : "bg-white-500 text-black"}
-              >
-                {pedido.rowSpan > 0 && (
-                  <td className="px-2 py-4 whitespace-nowrap text-xl" rowSpan={pedido.rowSpan}>
-                    {pedido.numeroOrden}
-                  </td>
-                )}
-                <td className="px-4 py-4 whitespace-nowrap text-xl">{pedido.textoOrdenConIcono}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl">{pedido.cantidad}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl">{pedido.comentario}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl">$ {parseInt(pedido.precio, 10)}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-xl">{pedido.barra}</td>
+        <div style={{ maxHeight: '850px', overflowY: 'auto' }}>
+          <table
+            style={{ textAlign: 'left', backgroundColor: 'white' }}
+            className="min-w-full divide-y divide-black-200"
+          >
+            <thead style={{ color: 'black' }}>
+              <tr>
+                <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">
+                  N
+                </th>
+                <th className="px-4 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">
+                  Texto Orden
+                </th>
+                <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">
+                  Cantidad
+                </th>
+                <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">
+                  Comentario
+                </th>
+                <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">
+                  Precio
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-black-200">
+              {mergedPedidos.map((pedido, index) => (
+                <tr
+                  key={index}
+                  className={pedido.estado === 1 ? "bg-blue-500 text-white" : "bg-white-500 text-black"}
+                >
+                  {pedido.rowSpan > 0 && (
+                    <td className="px-2 py-4 whitespace-nowrap text-xl" rowSpan={pedido.rowSpan}>
+                      {pedido.numeroOrden}
+                    </td>
+                  )}
+                  <td className="px-4 py-4 whitespace-nowrap text-xl">{pedido.textoOrdenConIcono}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-xl">{pedido.cantidad}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-xl">{pedido.comentario}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-xl">$ {parseInt(pedido.precio, 10)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
+
 

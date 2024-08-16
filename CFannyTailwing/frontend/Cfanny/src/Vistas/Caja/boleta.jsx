@@ -3,6 +3,8 @@ import 'jspdf-autotable';
 import { insertarPedido } from '../Consultas/INSERT/InsertPedido';
 import { createAndPrintPDF } from './constructorBoleta';
 import { reducirStock } from '../Consultas/UPDATE/Reducir-stockSemana';
+import { obtenerDatosmenuNoEnSemana } from '../Consultas/GET/get_menuNoSemana';
+import { reducirStockG } from '../Consultas/UPDATE/ReducirSockG';
 
 const Boleta = ({ 
   ListaMayor, 
@@ -12,12 +14,27 @@ const Boleta = ({
   borrar, 
   barra, 
   filter, 
-  clearFilter, 
+  clearCliente, 
   aumentarCliente, 
   nombre, 
-  funcionboleta 
+  funcionboleta,
+  dayname 
 }) => {
+
+
   const [barraunico, setbarraunico] = useState(0);
+  const [filtroMenu, setFiltroMenu] = useState([]);
+
+  
+
+  const manejarDatosMenu = async () => {
+   try {
+     const datosMenu = await obtenerDatosmenuNoEnSemana();
+     setFiltroMenu(datosMenu); // Actualiza el estado con los datos obtenidos
+   } catch (error) {
+     console.error('Error al manejar los datos del menú:', error);
+   }
+ };
 
   const getCurrentDateInLatinoFormat = () => {
     const now = new Date();
@@ -26,6 +43,8 @@ const Boleta = ({
     const year = now.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
+  useEffect(()=>{setFiltroMenu(manejarDatosMenu()),console.log(filtroMenu)},[])
 
   useEffect(() => {
     setbarraunico(funcionboleta());
@@ -75,38 +94,78 @@ const Boleta = ({
 
     // Esperar a que todas las inserciones se completen
     await Promise.all(insertPromises);
-    clearFilter();
+   
     aumentarCliente();
   };
 
-  const guardarImprimir = (nombre) => {
+  const guardarImprimir = async (nombre) => {
 
+    const ArraydayNames = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
 
+    const index = ArraydayNames.indexOf(dayname);
+    ListaMayor.forEach(element => {
 
+      const stringToCheck = element.stringSelecteDataId;
+      const lengthOfString = stringToCheck.length;
+      if(lengthOfString===1){
+        console.log(lengthOfString)
 
+        if (filtroMenu.some(item => item.id === parseInt(element.stringSelecteDataId,10)) ===false ){
+        
+          reducir(parseInt(element.stringSelecteDataId,10), index, element.cantidad); // Llama a reducir con id_menu como entero
+        }else{
+          reducirG(parseInt(element.stringSelecteDataId,10),element.cantidad); // Llama a reducir con id_menu como entero
+        }
+      }
 
+    else if (element.stringSelecteDataId && typeof element.stringSelecteDataId === 'string' && lengthOfString>1 ) {
+        const idMenus = element.stringSelecteDataId.split('-'); // Divide el string en partes
+        idMenus.forEach(id_menu => {
+          const idMenuInt = parseInt(id_menu, 10); // Convierte id_menu a entero
 
- 
+          if (filtroMenu.some(item => item.id === idMenuInt) ===false){
+            reducir(idMenuInt, index, element.cantidad); // Llama a reducir con id_menu como entero
+          }else{
+            reducirG(idMenuInt,element.cantidad); // Llama a reducir con id_menu como entero
+          }
+          //console.log(idMenuInt)
+        });
+      } else {
+        console.log('stringSelecteDataId is not a string:', element.stringSelecteDataId);
+      }
+    });
+  
     if (nombre === null) {
-      handleCloseAndClear();
-      createAndPrintPDF(ListaMayor, barraunico, precioTotal);
+      // Aseguramos que las funciones se completen antes de redirigir
+      await handleCloseAndClear();
+      await createAndPrintPDF(ListaMayor, barraunico, precioTotal);
+      await clearCliente();
+     
     } else {
-      handleCloseAndClear();
+      await handleCloseAndClear();
+      await clearCliente();
     }
+
+     window.location.reload();
   };
+  
 
   const reducir = async (id_menu, id_dia, cantidad) => {
     try {
-      // Define los valores que deseas pasar como parámetros
-      const id_menu = 1; // Ejemplo de ID del menú
-      const id_dia = 2; // Ejemplo de ID del día
-      const cantidad = 10; // Ejemplo de cantidad
-  
-      // Llama a la función con los parámetros
+      
       const resultado = await reducirStock(id_menu, id_dia, cantidad);
       console.log('Resultado:', resultado);
     } catch (error) {
       console.error('Error al llamar a reducirStock:', error);
+    }
+  };
+  const reducirG = async (id, cantidad) => {
+    try {
+      
+      const resultado = await reducirStockG(id, cantidad);
+      console.log('Resultado:', resultado);
+    } catch (error) {
+      console.error('Error al llamar a reducirStockG:', error);
     }
   };
 
@@ -171,7 +230,7 @@ const Boleta = ({
                     <tr key={index}>
                       <td style={{ fontSize: "23px", textAlign: "left" }} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.textoOrden}</td>
                       <td style={{ fontSize: "23px", textAlign: "center" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.cantidad}</td>
-                      <td style={{ fontSize: "23px", textAlign: "left" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.precio}</td>
+                      <td style={{ fontSize: "23px", textAlign: "left" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${Math.round(item.precio)}</td>
                       <td style={{ fontSize: "23px", textAlign: "left" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.comentario}</td>
                     </tr>
                   ))}
@@ -182,7 +241,7 @@ const Boleta = ({
             {/* Información adicional */}
             <div className="flex justify-between">
               <h4 style={{ fontSize: "30px" }} className="text-2xl leading-6 font-medium text-gray-900">Codigo {barraunico}</h4>
-              <h4 style={{ fontSize: "30px" }} className="text-2xl leading-6 font-medium text-gray-900">Total: ${precioTotal}</h4>
+              <h4 style={{ fontSize: "30px" }} className="text-2xl leading-6 font-medium text-gray-900">Total: ${Math.round(precioTotal)}</h4>
             </div>
           </div>
         </div>

@@ -21,9 +21,6 @@ const SelectedDataTable = ({ ListaMayor, incrementarCantidad, decrementarCantida
 
     }
 
-
-
-
     return (
         <table className="min-w-full divide-y divide-gray-200">
             <thead style={{ backgroundColor: "blue", color: "white" }}>
@@ -61,9 +58,9 @@ const SelectedDataTable = ({ ListaMayor, incrementarCantidad, decrementarCantida
                         <td style={{ fontSize: "20px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg">{item.comentario}</td>
                         <td style={{ fontSize: "20px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg space-x-2">
                             <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-red-500 text-white rounded-full" onClick={() => eliminarFila(index)}>Eliminar</button>
-                            <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego pan')}>Pan  <FontAwesomeIcon icon={faBreadSlice} /></button>
-                            <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego postre')}>Postre  <FontAwesomeIcon icon={faIceCream} /></button>
-                            <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego bebida')}>Bebida <FontAwesomeIcon icon={faWineBottle} /></button>
+                            <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Empanada')}>Pan  <FontAwesomeIcon icon={faBreadSlice} /></button>
+                            <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Postre')}>Postre  <FontAwesomeIcon icon={faIceCream} /></button>
+                            <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Bebida')}>Bebida <FontAwesomeIcon icon={faWineBottle} /></button>
                         </td>
                     </tr>
                 ))}

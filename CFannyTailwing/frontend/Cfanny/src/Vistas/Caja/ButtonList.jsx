@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { obtenerDatosSemana } from '../Consultas/GET/getDatosSemana';
 import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 
@@ -6,8 +6,7 @@ const ButtonList = ({ handleSelectData, dayName }) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedTipo, setSelectedTipo] = useState(null);
     const [datosSemana, setDatosSemana] = useState([]);
-    const [clickCounts, setClickCounts] = useState({}); // Estado para contar clics por botón
-    const [totalClicks, setTotalClicks] = useState(0); // Estado para contar clics globales
+    const buttonListRef = useRef(null); // Referencia al componente ButtonList
 
     useEffect(() => {
         const fetchDatos = async () => {
@@ -30,8 +29,12 @@ const ButtonList = ({ handleSelectData, dayName }) => {
     }, [dayName, obtenerDatosSemana, obtenerDatosMenu]);
 
     useEffect(() => {
-        const handleClick = () => {
-            setTotalClicks(prevTotal => prevTotal + 1); // Incrementa el contador global de clics
+        const handleClick = (event) => {
+            if (buttonListRef.current && !buttonListRef.current.contains(event.target)) {
+                // Aquí puedes actualizar el estado o realizar alguna acción
+                // Por ejemplo, puedes volver a obtener los datos
+                fetchDatos();
+            }
         };
 
         document.addEventListener('click', handleClick);
@@ -40,6 +43,21 @@ const ButtonList = ({ handleSelectData, dayName }) => {
             document.removeEventListener('click', handleClick);
         };
     }, []);
+
+    const fetchDatos = async () => {
+        try {
+            const datos = await obtenerDatosSemana();
+            if (dayName) {
+                setDatosSemana(datos.filter((dato) => dato.dia === dayName));
+            }
+            const data = await obtenerDatosMenu();
+            const tiposPermitidos = [5, 6, 7, 8, 9, 13, 14];
+            const filteredData = data.filter((item) => tiposPermitidos.includes(item.tipo));
+            setDatosSemana((prevDatosSemana) => [...prevDatosSemana, ...filteredData]);
+        } catch (error) {
+            console.error('Error al obtener datos:', error);
+        }
+    };
 
     const handleOpenModal = (tipo) => {
         setSelectedTipo(tipo);
@@ -52,11 +70,6 @@ const ButtonList = ({ handleSelectData, dayName }) => {
     };
 
     const handleButtonClick = (dato) => {
-        // Actualiza el contador de clics específico para el botón
-        setClickCounts((prevCounts) => ({
-            ...prevCounts,
-            [dato.id]: (prevCounts[dato.id] || 0) + 1
-        }));
         handleSelectData(dato);
     };
 
@@ -75,8 +88,16 @@ const ButtonList = ({ handleSelectData, dayName }) => {
     const uniqueType3and12Buttons = getUniqueButtons(datosSemana.filter(dato => dato.tipo === 3 || dato.tipo === 12));
     const uniqueType6and13and14Buttons = getUniqueButtons(datosSemana.filter(dato => dato.tipo === 6 || dato.tipo === 13 || dato.tipo === 14));
 
+    const tipoToTitle = {
+        4: 'Empanadas ',
+        5: 'Bebidas',
+        7: 'Postres',
+        8: 'Otro',
+        9: 'Special'
+    };
+
     return (
-        <div style={{ fontSize: "18px" }} className="grid grid-cols-5 gap-2">
+        <div style={{ fontSize: "18px" }} className="grid grid-cols-5 gap-2" ref={buttonListRef}>
             {uniqueGeneralButtons.map((dato) => (
                 <button
                     key={dato.id}
@@ -87,7 +108,6 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                     {dato.nombre}<br></br>
                     {dato.stockG}
                     {dato.stockD}<br></br>
-                  
                 </button>
             ))}
 
@@ -101,7 +121,6 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                     {dato.nombre}<br></br>
                     {dato.stockG}
                     {dato.stockD}<br></br>
-                 
                 </button>
             ))}
 
@@ -115,11 +134,10 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                     {dato.nombre}<br></br>
                     {dato.stockG}
                     {dato.stockD}<br></br>
-                  
                 </button>
             ))}
 
-            {[4, 5, 7, 8, 9].map((tipo) => (
+            {[7, 5, 4, 8, 9].map((tipo) => (
                 <button
                     key={tipo}
                     onClick={() => handleOpenModal(tipo)}
@@ -130,21 +148,19 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                                 tipo === 7 ? "teal" :
                                     tipo === 8 ? "gray" :
                                         tipo === 9 ? "indigo" : "lightgray",
-                        color: "black"
+                        color: "white",
+                        fontSize:"25px"
                     }}
                 >
-                    {tipo === 4 && 'Empanadas'}
-                    {tipo === 5 && 'Bebidas \n\n' }
-                    {tipo === 7 && 'Postre'}
-                    {tipo === 8 && 'Otro'}
-                    {tipo === 9 && 'Special'}
+                    {tipoToTitle[tipo]}
+                    
                 </button>
             ))}
 
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div style={{backgroundColor:"black"}} className="bg-white border-2 border-white p-4 rounded">
-                        <h2 className="text-xl font-bold">Items del tipo {selectedTipo}</h2>
+                        <h2 className="text-xl font-bold">Items del tipo {tipoToTitle[selectedTipo]}</h2>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {getUniqueButtons(datosSemana.filter(dato => dato.tipo === selectedTipo)).map((dato) => (
@@ -166,7 +182,6 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                                     {dato.nombre}<br></br>
                                     {dato.stockG}
                                     {dato.stockD}<br></br>
-                                  
                                 </button>
                             ))}
                         </div>
@@ -177,12 +192,12 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                     </div>
                 </div>
             )}
-
-           
         </div>
     );
 };
 
 export default ButtonList;
+
+
 
 

@@ -90,12 +90,13 @@ export default function Ventas() {
   const downloadCSV = () => {
     const header = ['Número de Orden', 'Cliente', 'Texto Orden', 'Cantidad', 'Comentario', 'Precio', 'Fecha'];
     const rows = ventas.map(venta => [
+    
       venta.numeroOrden,
       venta.estado === 0 ? 'Caja' : venta.estado === 1 ? 'Encargo' : venta.estado === 5 ? 'Cancelado' : venta.estado === 3 ? 'Encargo en espera' : 'Desconocido',
       venta.textoOrden,
       venta.cantidad,
       venta.comentario,
-      venta.precio,
+      Math.round(venta.precio),
       formatDate(venta.fechaVenta),
     ]);
 
@@ -119,7 +120,7 @@ export default function Ventas() {
   return (
     <div className="w-full min-h-screen p-4 flex flex-row">
       {/* Sección de resumen de ganancias totales */}
-      <div style={{ backgroundColor: "black", textAlign:'left' }} className="w-1/3 p-4 bg-gray-100 border-r border-gray-300">
+      <div style={{ backgroundColor: "black", textAlign:'left' }} className="w-1/4 p-4 bg-gray-100 border-r border-gray-300">
         <br /><br /><br />
 
         <div className="mb-4">
@@ -175,23 +176,23 @@ export default function Ventas() {
       </div>
 
       {/* Sección de la tabla de ventas */}
-      <div className="w-2/3 p-4 overflow-auto">
-        <h2 className="text-4xl font-bold mb-6">Ventas</h2>
+      <div className="w-5/6 p-4 overflow-auto">
+        <h2 style={{ textAlign: "center" }} className="text-4xl font-bold mb-6">Ventas</h2>
 
         <div style={{ textAlign: "center" }} className="flex-1 overflow-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Número de Orden</th>
-                <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                <th className="px-4 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Texto Orden</th>
-                <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-                <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Comentario</th>
-                <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+          <table style={{ textAlign: "center" }} className="min-w-full divide-y divide-gray-200">
+            <thead style={{ textAlign: "center" }}>
+              <tr style={{ textAlign: "center" }}>
+                <th style={{ textAlign: "center" }} className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">N</th>
+                <th style={{ textAlign: "center" }} className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                <th style={{ textAlign: "center" }} className="px-4 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Texto Orden</th>
+                <th style={{ textAlign: "center" }} className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                <th style={{ textAlign: "center" }} className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Comentario</th>
+                <th style={{ textAlign: "center" }} className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                <th style={{ textAlign: "center" }} className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody style={{ textAlign: "center" }} className="bg-white divide-y divide-gray-200">
               {ventas.map((venta, index) => (
                 <tr key={index}>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.numeroOrden}</td>
@@ -201,7 +202,7 @@ export default function Ventas() {
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.textoOrden}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.cantidad}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{venta.comentario}</td>
-                  <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">${venta.precio}</td>
+                  <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">${Math.round(venta.precio)}</td>
                   <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{formatDate(venta.fechaVenta)}</td>
                 </tr>
               ))}

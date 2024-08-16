@@ -29,6 +29,30 @@ db.connect((err) => {
   console.log('Conexión establecida con la base de datos');
 });
 
+
+
+app.get('/menuNoEnSemana', (req, res) => {
+  // Query para seleccionar todos los datos del menú
+  const query = `
+    SELECT menu.id, menu.nombre
+    FROM menu 
+    LEFT JOIN semana ON semana.id_menu = menu.id
+    WHERE semana.id_menu IS NULL;
+  `;
+
+  // Ejecutar la consulta
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error('Error al obtener datos del menúNo En semana:', error);
+      res.status(500).json({ error: 'Error al obtener datos del menúNo En semana' });
+    } else {
+      // Enviar los resultados como respuesta
+      res.status(200).json(results);
+    }
+  });
+});
+
+
 app.get('/ventas', (req, res) => {
   // Query para seleccionar todos los datos del menú
   const query = "SELECT * FROM `ventas`";
@@ -515,7 +539,7 @@ app.put('/actualizar-estado', (req, res) => {
   });
 });
 
-app.put('/api/reducir-stock', (req, res) => {
+app.put('/reducir-stock', (req, res) => {
   const { id_menu, id_dia, cantidad } = req.body;
 
   if (!id_menu || !id_dia || !cantidad) {
@@ -538,6 +562,32 @@ app.put('/api/reducir-stock', (req, res) => {
       }
 
       res.json({ message: "Stock reducido exitosamente" });
+  });
+});
+
+app.put('/reducir-stockMayor', (req, res) => {
+  const { id,cantidad } = req.body;
+
+  if (!id || !cantidad) {
+      return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
+  }
+
+  const query = `
+      UPDATE menu 
+      SET stockG = stockG - ? 
+      WHERE id = ? AND stockG >= ?;
+  `;
+
+  db.query(query, [cantidad, id, cantidad], (err, result) => {
+      if (err) {
+          return res.status(500).json({ error: "Error al actualizar el stock" });
+      }
+
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ error: "No se encontró el registro o stock insuficiente" });
+      }
+
+      res.json({ message: "StockG reducido exitosamente" });
   });
 });
 

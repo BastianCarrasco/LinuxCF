@@ -2,9 +2,9 @@ import axios from 'axios';
 import { link } from '../servidor';
 
 // Función para obtener datos del menú desde el servidor
-export const obtenerDatosMenu = async () => {
+export const obtenerDatosmenuNoEnSemana = async () => {
   try {
-    const response = await axios.get(`http://${link}:5150/datosmenu`);
+    const response = await axios.get(`http://${link}:5150/menuNoEnSemana`);
     return response.data; // Retorna los datos obtenidos del menú
   } catch (error) {
     console.error('Error al obtener datos del menú:', error);

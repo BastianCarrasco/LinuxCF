@@ -14,12 +14,17 @@ import Ventas from './Vistas/Ventas/Ventas';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [bandera, setbandera] = useState(0);
 
   useEffect(() => {
     // Cargar el usuario del localStorage al iniciar
     const savedUser = localStorage.getItem('user');
     setUser(savedUser);
   }, []);
+
+  useEffect(()=>{
+    console.log(user);
+  },[user])
 
   // Función para verificar el acceso
   const hasAccess = (view) => {

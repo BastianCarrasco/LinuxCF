@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import DateTimeDisplay from './DateTimeDisplay';
 import ButtonList from './ButtonList';
 import SelectedDataTable from './SelectedDataTable';
-import { obtenerDatosSemana } from '../Consultas/GET/getDatosSemana';
+
 import { obtenerDatosCombos } from '../Consultas/GET/getCombos';
 import { obtenerDatosTiposMenu } from '../Consultas/GET/gettiposMenu';
-import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
+
 import { textoOrden } from './TextoOrden';
 import { generarNumeroUnico } from './Barra';
 import Boleta from './boleta';
 import { FaArrowRotateLeft } from "react-icons/fa6";
 import { numeroCliente } from '../Consultas/GET/numeroCliente';
 import { handleAgregarOrden } from './agregarOrden';
-import { SiFireship } from "react-icons/si";
+
 
 
 
@@ -46,7 +46,7 @@ const Caja = () => {
       const total = response.total;
       return Number(total); // Convertir a número explícitamente
     } catch (error) {
-      console.error('Error al obtener el número de cliente:', error);
+     
       return 0; // Retorna 0 en caso de error
     }
   };
@@ -314,27 +314,6 @@ const Caja = () => {
     return () => clearInterval(timerId);
   }, []);
 
-  // useEffect(() => {
-  //   const fetchDatos = async () => {
-  //     try {
-  //       if (dayName) {
-  //         const datos = await obtenerDatosSemana();
-
-
-  //         setDatosSemana(datos.filter((dato) => dato.dia === dayName));
-  //       }
-
-  //       const data = await obtenerDatosMenu();
-  //       const tiposPermitidos = [5, 6, 7, 8, 9, 13, 14];
-  //       const filteredData = data.filter((item) => tiposPermitidos.includes(item.tipo));
-  //       setDatosSemana((prevDatosSemana) => [...prevDatosSemana, ...filteredData]);
-  //     } catch (error) {
-  //       console.error('Error al obtener datos:', error);
-  //     }
-  //   };
-
-  //   fetchDatos();
-  // }, [dayName, obtenerDatosSemana, obtenerDatosMenu]);
 
   useEffect(() => {
     const fetchCombos = async () => {
@@ -495,11 +474,12 @@ const Caja = () => {
               borrar={borrarListaMayor}
               barra={barra}
               filter={Cliente}
-              clearFilter={clearCliente}
+              clearCliente={clearCliente}
               aumentarCliente={fetchNumeroCliente}
               estado={estado}
               nombre={Cliente}
               funcionboleta={generarNumeroUnico}
+              dayname={dayName}
             />
             <p style={{ fontSize: '30px', marginTop: '50px', color: 'white' }}>
               TOTAL:  $ {precioTotal}

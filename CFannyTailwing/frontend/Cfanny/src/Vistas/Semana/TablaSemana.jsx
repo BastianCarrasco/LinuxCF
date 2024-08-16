@@ -101,11 +101,11 @@ const TablaDia = ({ dia, datosSemana }) => {
         }
     }
 
-    useEffect(() => {
-        console.log(botonesSeleccionados);
-        console.log('Valor de inputs:', valorInputs);
-        console.log(diaSeleccionado);
-    })
+    // useEffect(() => {
+    //     console.log(botonesSeleccionados);
+    //     console.log('Valor de inputs:', valorInputs);
+    //     console.log(diaSeleccionado);
+    // })
 
     useEffect(() => {
         const fetchMenuData = async () => {

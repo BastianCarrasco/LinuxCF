@@ -5,7 +5,7 @@ import {link} from '../servidor';
 export const obtenerDatosTiposMenu = async () => {
   try {
     const response = await axios.get(`http://${link}:5150/tiposmenu`);
-    console.log( response + " DATO RARO");
+    // console.log( response + " DATO RARO");
 
     return response.data; // Retorna los datos obtenidos del menú
   } catch (error) {

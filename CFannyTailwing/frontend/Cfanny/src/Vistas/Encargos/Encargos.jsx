@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { obtenerDatosPedidos } from "../Consultas/GET/getPedidos";
 import { eliminarPedido } from "../Consultas/DELETE/eliminarPedido";
 import { actualizarEstadoPedido } from "../Consultas/UPDATE/editarEstado";
-import Boleta from "./BoletaEncargo";
+import { createAndPrintPDF } from "./BoletaEncargo"; // Import the function correctly
 
 export default function Encargos() {
   const [pedidos, setPedidos] = useState([]);
@@ -36,7 +36,6 @@ export default function Encargos() {
     try {
       const pedidosToDelete = pedidos.filter(pedido => pedido.barra === barra);
       if (pedidosToDelete.length === 0) {
-   //     console.log("No se encontraron pedidos con el código de barra proporcionado.");
         return;
       }
       for (const pedido of pedidosToDelete) {
@@ -44,40 +43,34 @@ export default function Encargos() {
       }
       const updatedPedidos = pedidos.filter(pedido => pedido.barra !== barra);
       setPedidos(updatedPedidos);
-   //   console.log("Pedidos eliminados:", pedidosToDelete);
     } catch (error) {
-  //    console.error('Error al eliminar pedidos:', error);
+      console.error('Error al eliminar pedidos:', error);
     }
   };
 
   const handleUpdateEstado = async (barra) => {
     try {
-      // Define el nuevo estado que deseas establecer, por ejemplo, 1 para Encargo
-      const nuevoEstado = 1;  // Ajusta el valor según tu lógica de negocio
-  
-      // Llama a la función para actualizar el estado del pedido
+      const nuevoEstado = 1; // Ajusta el valor según tu lógica de negocio
       const resultado = await actualizarEstadoPedido(barra, nuevoEstado);
-  
-      // Actualiza el estado local con la respuesta del servidor
+
       setPedidos((prevPedidos) => prevPedidos.map((pedido) =>
         pedido.barra === barra ? { ...pedido, estado: nuevoEstado } : pedido
       ));
-      
-  //    console.log("Estado del pedido actualizado correctamente:", resultado);
     } catch (error) {
-  //    console.error('Error al actualizar el estado del pedido:', error);
+      console.error('Error al actualizar el estado del pedido:', error);
     }
   };
+
   const handlePrintBoleta = async (barra) => {
     const pedidosToPrint = pedidos.filter(pedido => pedido.barra === barra);
     if (pedidosToPrint.length > 0) {
       await handleUpdateEstado(barra);
-      Boleta.createAndPrintPDF(pedidosToPrint, barra);
+      createAndPrintPDF(pedidosToPrint, barra); // Call the function directly
       fetchPedidos();
     }
   };
 
-  const filteredPedidos = pedidos.filter(pedido => pedido.estado=== 3);
+  const filteredPedidos = pedidos.filter(pedido => pedido.estado === 3);
 
   const mergeOrders = (pedidos) => {
     const mergedPedidos = [];
@@ -111,54 +104,53 @@ export default function Encargos() {
     <div className="w-full mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Encargos</h1>
       {/* <input
-        className="border border-gray-400 p-2 mb-6 w-full text-center"
+        className="border border-black-400 p-2 mb-6 w-full text-center"
         type="text"
         value={filter}
         onChange={handleInputChange}
         placeholder="Escanea o ingresa el código de barra aquí"
       /> */}
       <div className="overflow-x-auto w-full">
-        <table style={{textAlign:'left'}} className="min-w-full divide-y divide-gray-200 w-full">
+        <table  style={{ textAlign: 'left',backgroundColor:'white', color: 'black' }} className="min-w-full divide-y divide-black-200 w-full">
           <thead>
             <tr>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">N</th>
-             
-              <th className="px-4 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Texto Orden</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Comentario</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-              <th className="px-6 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Barra</th>
-              <th className="px-4 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-          
-              <th className="px-6 py-3 text-left text-2xl font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+              <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">N</th>
+              <th className="px-4 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Texto Orden</th>
+              <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Cantidad</th>
+              <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Comentario</th>
+              <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Precio</th>
+              <th className="px-4 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Cliente</th>
+              <th className="px-6 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200 w-full">
+          <tbody style={{backgroundColor:'white', color: 'black'}}  className="bg-white divide-y divide-black-200 w-full">
             {mergedPedidos.map((pedido, index) => (
-              <tr
-                key={index}
-                className={pedido.estado !== 3 ? "bg-blue-500 text-white" : ""}
-              >
+              <tr style={{backgroundColor:'white', color: 'black'}}  key={index} className={pedido.estado !== 3 ? "bg-blue-500 text-white" : ""}>
                 {pedido.rowSpan > 0 && (
-                  <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500" rowSpan={pedido.rowSpan}>
+                  <td  tyle={{backgroundColor:'white', color: 'black'}}  className="px-2 py-4 whitespace-nowrap text-xl text-black-500" rowSpan={pedido.rowSpan}>
                     {pedido.numeroOrden}
                   </td>
                 )}
-                <td className="px-4 py-4 whitespace-nowrap text-xl text-gray-500">{pedido.textoOrden}</td>
-                
-                <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{pedido.cantidad}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{pedido.comentario}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">$ {parseInt(pedido.precio, 10)}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-xl text-gray-500">{pedido.barra}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl text-gray-500">{pedido.cliente}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-xl text-gray-500">
+                <td className="px-4 py-4 whitespace-nowrap text-xl text-black-500">{pedido.textoOrden}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-xl text-black-500">{pedido.cantidad}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-xl text-black-500">{pedido.comentario}</td>
+                <td className="px-2 py-4 whitespace-nowrap text-xl text-black-500">$ {parseInt(pedido.precio, 10)}</td>
+
+                {pedido.rowSpan > 0 && (
+
+                <td tyle={{backgroundColor:'white', color: 'black'}}  className="px-2 py-4 whitespace-nowrap text-xl text-black-500">{pedido.cliente}</td>
+              )}
+                {pedido.rowSpan > 0 && (
+                <td style={{backgroundColor:'white'}} className="px-6 py-4 whitespace-nowrap text-xl text-black-500">
+
                   <button
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
                     onClick={() => handlePrintBoleta(pedido.barra)}
                   >
-                    Boucher
+                    Voucher/Boleta
                   </button>
                 </td>
+ )}
               </tr>
             ))}
           </tbody>

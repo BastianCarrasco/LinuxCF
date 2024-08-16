@@ -1,5 +1,6 @@
 import JsBarcode from 'jsbarcode';
 import jsPDF from 'jspdf';
+import LOGO from '../Caja/LOGO.png';
 
 /**
  * Función para crear y imprimir el PDF
@@ -22,13 +23,12 @@ export const getCurrentDateInLatinoFormat = () => {
   return `${day}/${month}/${year}`;
 };
 
-
-
-
 export const createAndPrintPDF = (listaMayor, barra, precioTotal) => {
   const doc = new jsPDF({
     format: [80, 200],
   });
+
+  
 
   // Añadir título o logo opcional en la parte superior
   doc.setFontSize(10);
@@ -79,15 +79,19 @@ export const createAndPrintPDF = (listaMayor, barra, precioTotal) => {
 
   // Añadir el precio total
   doc.setFont('helvetica', 'bold');
-  doc.text(`TOTAL: $${totalPrice.toFixed(2)}`, 10, yPosition);
+  doc.text(`TOTAL: $${totalPrice.toFixed(0)}`, 10, yPosition);
   yPosition += 10;
 
-  // Opcional: Footer
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.text('¡Gracias por su preferencia!', 10, yPosition);
   yPosition += 5;
-  // doc.text('www.restaurantexyz.com', 10, yPosition);
+  // Añadir la imagen al final de la boleta
+  doc.addImage(LOGO, 'PNG', 10, yPosition, 60, 20);
+  yPosition += 40;
+
+  // Opcional: Footer
+  
 
   // Guardar e imprimir el PDF
   const pdfData = doc.output('datauristring');
@@ -96,5 +100,6 @@ export const createAndPrintPDF = (listaMayor, barra, precioTotal) => {
   link.download = 'boleta.pdf';
   link.click();
 };
+
 
 

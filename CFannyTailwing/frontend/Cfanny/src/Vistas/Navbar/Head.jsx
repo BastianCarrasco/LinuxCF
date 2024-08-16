@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Navbar({ user }) {
+
+  const [semana,setsemana] = useState(false);
+  const [stock,setsetstock] = useState(false);
+
+
+
   return (
     <nav className="bg-gray-800 text-white fixed top-0 left-0 w-full p-4 flex justify-between items-center">
       <h1 className="text-xl">Colaciones Fanny</h1>

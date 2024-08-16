@@ -5,10 +5,10 @@ import { link } from '../servidor';
 export const numeroCliente = async () => {
   try {
     const response = await axios.get(`http://${link}:5150/numeroCliente`);
-    console.log('Número de cliente obtenido CONSULTA:', response.data);
+    // console.log('Número de cliente obtenido CONSULTA:', response.data);
     return response.data; // Retorna los datos obtenidos del servidor
   } catch (error) {
-    console.error('Error al obtener el número de cliente:', error);
+    //console.error('Error al obtener el número de cliente:', error);
     throw error; // Lanza el error para manejarlo en el contexto donde se llama esta función
   }
 };
