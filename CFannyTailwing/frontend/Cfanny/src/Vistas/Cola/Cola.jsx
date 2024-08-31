@@ -6,6 +6,7 @@ import { actualizarComentario } from "../Consultas/UPDATE/actualizar_comentario_
 import { actualizarEstadoPedido } from "../Consultas/UPDATE/editarEstado";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBreadSlice, faIceCream, faWineBottle, faFile } from '@fortawesome/free-solid-svg-icons';
+import reparador_stock from "../Caja/repararStock/reparador";
 
 
 export default function Cola() {
@@ -257,17 +258,25 @@ useEffect(() => {
 
   };
 
-  const handleCancel = (pedido) => {
-    let barraCancelar = pedido.barra;
-
-    pedidos.forEach(element => {
+  const handleCancel = async (n) => {
+    const barraCancelar = n.barra;
+  
+    // Utilizamos un bucle for...of para poder usar await dentro del bucle
+    for (const element of pedidos) {
       if (element.barra === barraCancelar) {
+        // Ejecuta reparador_stock y espera a que termine antes de continuar
+        await reparador_stock(element);
+  
+        // Actualiza el estado del pedido después de procesarlo
         handleActualizarEstado(element);
       }
-    });
-
+    }
   
+    
+    fetchPedidos();
   };
+  
+  
 
   const filteredPedidos = pedidos.filter(pedido => pedido.estado === 1 || pedido.estado === 0);
 

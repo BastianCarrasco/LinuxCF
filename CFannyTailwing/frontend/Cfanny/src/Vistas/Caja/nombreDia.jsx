@@ -16,4 +16,22 @@ export const tiempo = (setDayName, setCurrentDate) => {
     setDayName(dayName); // Establece el nombre del día
 };
 
+// tiempo.js
+
+// tiempo.js
+
+export const obtenerNumeroDelDia = () => {
+  const now = new Date();
   
+  // Obtén el índice del día de la semana (0 para domingo, 1 para lunes, etc.)
+  let diaNumero = now.getDay();
+  
+  // Ajusta el número del día si es domingo
+  if (diaNumero === 0) {
+    diaNumero = 1; // Cambia el domingo (0) a lunes (1)
+  }
+
+  // Devuelve el número del día
+  return diaNumero;
+};
+

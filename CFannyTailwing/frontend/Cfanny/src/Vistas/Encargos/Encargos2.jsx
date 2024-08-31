@@ -3,6 +3,7 @@ import { obtenerDatosPedidos } from "../Consultas/GET/getPedidos";
 import { eliminarPedido } from "../Consultas/DELETE/eliminarPedido";
 import { actualizarEstadoPedido } from "../Consultas/UPDATE/editarEstado";
 import { createAndPrintPDF } from "./BoletaEncargo"; // Import the function correctly
+import reparador_stock from "../Caja/repararStock/reparador";
 
 export default function Encargos2() {
   const [pedidos, setPedidos] = useState([]);
@@ -32,17 +33,22 @@ export default function Encargos2() {
   };
 
 
-  const handleCancel = (pedido) => {
-    let barraCancelar = pedido.barra;
+  const handleCancel = async (n) => {
+    const barraCancelar = n.barra;
   
-    pedidos.forEach(element => { 
+    // Utilizamos un bucle for...of para poder usar await dentro del bucle
+    for (const element of pedidos) {
       if (element.barra === barraCancelar) {
-        // Aquí puedes realizar la lógica para cancelar el pedido
-        // Por ejemplo, podrías usar un estado para gestionar el pedido cancelado
-        // o simplemente llamar a handleActualizarEstado directamente aquí
-      handleActualizarEstado(element);
+        // Ejecuta reparador_stock y espera a que termine antes de continuar
+        await reparador_stock(element);
+  
+        // Actualiza el estado del pedido después de procesarlo
+        handleActualizarEstado(element);
       }
-    });
+    }
+  
+    
+    fetchPedidos();
   };
 
   const fetchPedidos = async () => {
