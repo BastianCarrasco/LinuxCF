@@ -11,3 +11,4 @@ export const obtenerDatosMenu = async () => {
     throw error; // Lanza el error para manejarlo en el contexto donde se llama esta función
   }
 };
+

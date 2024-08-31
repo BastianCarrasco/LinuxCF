@@ -266,9 +266,7 @@ useEffect(() => {
       }
     });
 
-    fetchPedidos();
-
-    
+  
   };
 
   const filteredPedidos = pedidos.filter(pedido => pedido.estado === 1 || pedido.estado === 0);

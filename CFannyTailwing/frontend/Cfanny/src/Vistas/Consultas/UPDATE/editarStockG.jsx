@@ -8,7 +8,7 @@ export const actualizarMenu = async (id, nombre, tipo, precio, stockG) => {
       precio: precio,
       stockG: stockG
     });
-    // console.log('Menú actualizado correctamente:', response.data);
+     console.log('Menú actualizado correctamente:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error al actualizar el menú:', error.response ? error.response.data : error.message);

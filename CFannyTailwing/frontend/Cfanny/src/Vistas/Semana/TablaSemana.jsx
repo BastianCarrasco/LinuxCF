@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
-import { obtenerDatosSemana } from '../Consultas/GET/getDatosSemana';
 import { actualizarIdSemana } from '../Consultas/UPDATE/editarIdsemana';
 import { actualizarStockSemana } from '../Consultas/UPDATE/editarStockSemana';
 import { actualizarStockGlobal } from '../Consultas/UPDATE/sumarStockGlobal';

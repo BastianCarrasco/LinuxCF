@@ -128,8 +128,6 @@ app.get('/precio_colaciones', (req, res) => {
   });
 });
 
-
-
 app.get('/datosmenu', (req, res) => {
   // Query para seleccionar todos los datos del menú
   const query = 'SELECT * FROM menu';
@@ -568,7 +566,7 @@ app.put('/reducir-stockMayor', (req, res) => {
 });
 
 
-///////////////////////
+
 
 app.put('/aumentar-stock', (req, res) => {
   const { id_menu, id_dia, cantidad } = req.body;

@@ -12,16 +12,20 @@ export default function Stock() {
   const [activeTab, setActiveTab] = useState('menu'); // Estado para controlar qué mostrar
 
   // Función para obtener datos del menú
-  function datosMenuStock() {
-    obtenerDatosMenu()
-      .then(data => setDatosMenu(data))
-      .catch(error => console.error('Error al obtener datos del menú:', error));
+  async function datosMenuStock() {
+    try {
+      const data = await obtenerDatosMenu(); // Espera a que la promesa se resuelva
+      setDatosMenu(data); // Luego, establece los datos
+    } catch (error) {
+      console.error('Error al obtener datos del menú:', error); // Maneja cualquier error
+    }
   }
   
   useEffect(() => {
     // Obtener datos del menú al montar el componente
-    datosMenuStock(); // Llama a la función aquí, usando paréntesis para ejecutar la función
+    datosMenuStock(); // Llama a la función aquí
   }, []);
+  
   
   // Función para eliminar un ítem del menú
   const handleEliminarItem = async (nombre) => {
@@ -32,6 +36,14 @@ export default function Stock() {
       console.error('Error al eliminar el ítem:', error);
     }
   };
+
+  useEffect(() => {
+    // Obtener datos del menú al montar el componente
+    console.log(datosMenu); // Llama a la función aquí, usando paréntesis para ejecutar la función
+    
+  }, [datosMenu]);
+
+  
 
   // Función para mostrar la tabla del menú
   const handleShowMenu = () => {
