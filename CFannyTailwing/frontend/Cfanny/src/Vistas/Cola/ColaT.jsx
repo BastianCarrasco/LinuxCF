@@ -7,8 +7,7 @@ import { actualizarEstadoPedido } from "../Consultas/UPDATE/editarEstado";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBreadSlice, faIceCream, faWineBottle, faFile } from '@fortawesome/free-solid-svg-icons';
 
-
-export default function Cola() {
+export default function ColaT() {
   const [pedidos, setPedidos] = useState([]);
   const [filter, setFilter] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -312,8 +311,7 @@ useEffect(() => {
 
   return (
     <div className="w-full min-h-screen p-4 flex flex-col">
-      {/* <h2 className="text-4xl font-bold mb-6">Cola</h2> */}
-  
+      
       <input
         type="text"
         value={filter}
@@ -327,7 +325,7 @@ useEffect(() => {
       <div className="flex-1 overflow-y-auto">
         <div style={{ maxHeight: '850px', overflowY: 'auto' }}>
           <table
-            style={{ textAlign: 'left', backgroundColor: 'white' }}
+            style={{ textAlign: 'left', backgroundColor: 'white', scale:"93%", marginLeft:"-45px" }}
             className="min-w-full divide-y divide-black-200"
           >
             <thead style={{ color: 'black' }}>
@@ -417,7 +415,7 @@ useEffect(() => {
                         onClick={() => handleCancel(pedido)}
                         className="bg-red-500 text-white px-4 py-2 rounded mt-2"
                       >
-                        Cancelar Pedido
+                        Cancelar
                       </button>
                     </td>
                   )}

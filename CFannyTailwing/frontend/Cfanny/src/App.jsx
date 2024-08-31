@@ -11,6 +11,9 @@ import Encargos from './Vistas/Encargos/Encargos';
 import Semana from './Vistas/Semana/Semana';
 import Stock from './Vistas/Stock/Stock';
 import Ventas from './Vistas/Ventas/Ventas';
+import Caja2 from './Vistas/Caja/Caja2';
+import Encargos2 from './Vistas/Encargos/Encargos2';
+import ColaT from './Vistas/Cola/ColaT';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -29,7 +32,7 @@ function App() {
   // Función para verificar el acceso
   const hasAccess = (view) => {
     if (user === 'Eduardo') return true;
-    if (user === 'Tablet' && ['Caja', 'Cola', 'Encargos'].includes(view)) return true;
+    if (user === 'Tablet' && ['Caja2', 'ColaT', 'Encargos2'].includes(view)) return true;
     return false;
   };
 
@@ -52,8 +55,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Home setUser={setUser} />} />
             <Route path="/caja" element={hasAccess('Caja') ? <Caja /> : <Navigate to="/" />} />
+            <Route path="/caja2" element={hasAccess('Caja2') ? <Caja2 /> : <Navigate to="/" />} />
             <Route path="/cola" element={hasAccess('Cola') ? <Cola /> : <Navigate to="/" />} />
+            <Route path="/colat" element={hasAccess('ColaT') ? <ColaT /> : <Navigate to="/" />} />
             <Route path="/encargo" element={hasAccess('Encargos') ? <Encargos /> : <Navigate to="/" />} />
+            <Route path="/encargo2" element={hasAccess('Encargos2') ? <Encargos2 /> : <Navigate to="/" />} />
             <Route path="/semana" element={hasAccess('Semana') ? <Semana /> : <Navigate to="/" />} />
             <Route path="/stock" element={hasAccess('Stock') ? <Stock /> : <Navigate to="/" />} />
             <Route path="/ventas" element={hasAccess('Ventas') ? <Ventas /> : <Navigate to="/" />} />

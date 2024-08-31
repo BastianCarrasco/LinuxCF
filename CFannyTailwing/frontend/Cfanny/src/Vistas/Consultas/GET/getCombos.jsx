@@ -4,7 +4,7 @@ import { link } from '../servidor';
 // Función para obtener datos del menú desde el servidor
 export const obtenerDatosCombos = async () => {
   try {
-    const response = await axios.get(`http://${link}:5150/combos`);
+    const response = await axios.get(`http://${link}:5150/datoscombos`);
     return response.data; // Retorna los datos obtenidos del menú
   } catch (error) {
     console.error('Error al obtener datos del menú:', error);

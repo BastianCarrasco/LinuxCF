@@ -9,7 +9,7 @@ export default function Navbar({ user }) {
 
 
   return (
-    <nav className="bg-gray-800 text-white fixed top-0 left-0 w-full p-4 flex justify-between items-center">
+    <nav className="bg-gray-800 text-white fixed top-0 left-0 w-full p-4 flex justify-between items-center relative z-1">
       <h1 className="text-xl">Colaciones Fanny</h1>
       <div style={{fontSize:"24px"}} className="flex justify-around flex-1">
         <Link to="/" className="hover:underline mx-4">Home</Link>
@@ -25,9 +25,9 @@ export default function Navbar({ user }) {
         )}
         {user === 'Tablet' && (
           <>
-            <Link to="/caja" className="hover:underline mx-4">Caja</Link>
-            <Link to="/cola" className="hover:underline mx-4">Cola</Link>
-            <Link to="/encargo" className="hover:underline mx-4">Encargos</Link>
+            <Link to="/caja2" className="hover:underline mx-4">CajaTablet</Link>
+            <Link to="/colat" className="hover:underline mx-4">ColaT</Link>
+            <Link to="/encargo2" className="hover:underline mx-4">EncargosT</Link>
           </>
         )}
       </div>

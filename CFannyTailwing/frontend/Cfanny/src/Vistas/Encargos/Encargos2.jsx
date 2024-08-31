@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
 import { obtenerDatosPedidos } from "../Consultas/GET/getPedidos";
 import { eliminarPedido } from "../Consultas/DELETE/eliminarPedido";
-
+import { actualizarEstadoPedido } from "../Consultas/UPDATE/editarEstado";
 import { createAndPrintPDF } from "./BoletaEncargo"; // Import the function correctly
 
-import { actualizarEstadoPedido } from "../Consultas/UPDATE/editarEstado";
-
-export default function Encargos() {
+export default function Encargos2() {
   const [pedidos, setPedidos] = useState([]);
   const [filter, setFilter] = useState("");
   const [selectedBarra, setSelectedBarra] = useState(null);
 
 
-
-  
+   
   const handleActualizarEstado = async (pedido) => {
     try {
       const barra = pedido.barra; // Asumimos que 'barra' está en el objeto pedido
@@ -47,7 +44,6 @@ export default function Encargos() {
       }
     });
   };
-
 
   const fetchPedidos = async () => {
     try {
@@ -101,14 +97,7 @@ export default function Encargos() {
     }
   };
 
-  const handlePrintBoleta = async (barra) => {
-    const pedidosToPrint = pedidos.filter(pedido => pedido.barra === barra);
-    if (pedidosToPrint.length > 0) {
-      await handleUpdateEstado(barra);
-      createAndPrintPDF(pedidosToPrint, barra); // Call the function directly
-      fetchPedidos();
-    }
-  };
+ 
 
   const filteredPedidos = pedidos.filter(pedido => pedido.estado === 3);
 
@@ -142,7 +131,7 @@ export default function Encargos() {
 
   return (
     <div className="w-full mx-auto px-4 py-8">
-      {/* <h1 className="text-3xl font-bold mb-6 text-center">Encargos</h1> */}
+     
       {/* <input
         className="border border-black-400 p-2 mb-6 w-full text-center"
         type="text"
@@ -160,7 +149,7 @@ export default function Encargos() {
               <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Comentario</th>
               <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Precio</th>
               <th className="px-4 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Cliente</th>
-              <th className="px-6 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Acciones</th>
+              {/* <th className="px-6 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Acciones</th> */}
             </tr>
           </thead>
           <tbody style={{backgroundColor:'white', color: 'black'}}  className="bg-white divide-y divide-black-200 w-full">
@@ -183,14 +172,14 @@ export default function Encargos() {
                 {pedido.rowSpan > 0 && (
                 <td style={{backgroundColor:'white'}} className="px-6 py-4 whitespace-nowrap text-xl text-black-500">
 
-                  <button
+                  {/* <button
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
                     onClick={() => handlePrintBoleta(pedido.barra)}
                   >
                     Voucher/Boleta
-                  </button>
+                  </button> */}
 
-                  <button
+<button
                       onClick={() => handleCancel(pedido)}
                       className="bg-red-500 text-white px-4 py-2 rounded"
                     >

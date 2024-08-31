@@ -4,7 +4,7 @@ import { faBreadSlice, faIceCream, faWineBottle } from '@fortawesome/free-solid-
 import { obtenerDatosSemana } from '../Consultas/GET/getDatosSemana';
 import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 
-const SelectedDataTable = ({ ListaMayor, setListaMayor, eliminarFila, toggleComentario, dayName }) => {
+const SelectedDataTableTT = ({ ListaMayor, setListaMayor, eliminarFila, toggleComentario, dayName }) => {
     const [datosSemana, setDatosSemana] = useState([]);
     const [datosMenu, setDatosMenu] = useState([]);
 
@@ -193,9 +193,9 @@ const incrementarCantidad = (index) => {
                     <th style={{ fontSize: "20px", color: "white" }} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                         Comentario
                     </th>
-                    <th style={{ fontSize: "20px", color: "white" }} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">
+                    {/* <th style={{ fontSize: "20px", color: "white" }} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">
                         Acciones
-                    </th>
+                    </th> */}
                 </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -212,12 +212,12 @@ const incrementarCantidad = (index) => {
                         </td>
                         <td style={{ fontSize: "30px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg">${item.precio}</td>
                         <td style={{ fontSize: "20px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg">{item.comentario}</td>
-                        <td style={{ fontSize: "20px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg space-x-2">
+                        {/* <td style={{ fontSize: "20px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg space-x-2">
                             <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-red-500 text-white rounded-full" onClick={() => eliminarFila(index)}>Eliminar</button>
                             <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Empanada')}>Pan  <FontAwesomeIcon icon={faBreadSlice} /></button>
                             <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Postre')}>Postre  <FontAwesomeIcon icon={faIceCream} /></button>
                             <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Bebida')}>Bebida <FontAwesomeIcon icon={faWineBottle} /></button>
-                        </td>
+                        </td> */}
                     </tr>
                 ))}
             </tbody>
@@ -225,4 +225,4 @@ const incrementarCantidad = (index) => {
     );
 };
 
-export default SelectedDataTable;
+export default SelectedDataTableTT;

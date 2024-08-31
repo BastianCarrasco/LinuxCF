@@ -70,53 +70,29 @@ app.get('/ventas', (req, res) => {
 });
 
 app.get('/numeroCliente', (req, res) => {
-  // Query para contar el número de filas en las tablas ventas y pedidos y sumar los resultados
+  // Consulta para obtener la suma de los valores únicos de numeroOrden en ambas tablas
   const query = `
-    SELECT
-      COALESCE(
-        (SELECT COUNT(*) FROM ventas),
-        0
-      ) +
-      COALESCE(
-        (SELECT COUNT(*) FROM pedidos),
-        0
-      ) AS total
+    SELECT 
+      (SELECT COUNT(DISTINCT numeroOrden) FROM ventas) +
+      (SELECT COUNT(DISTINCT numeroOrden) FROM pedidos) AS totalUnicos
   `;
 
   // Ejecutar la consulta
   db.query(query, (error, results) => {
     if (error) {
-      console.error('Error al obtener el número de filas de las tablas ventas y pedidos:', error);
-      res.status(500).json({ error: 'Error al obtener el número de filas de las tablas ventas y pedidos' });
-    } else {
-      // Acceder al resultado
-      const total = results[0] ? results[0].total : 0;
-
-      // Enviar el resultado como respuesta
-      res.status(200).json({ total });
+      console.error('Error al obtener el número total de tipos únicos:', error);
+      return res.status(500).json({ error: 'Error al obtener el número total de tipos únicos' });
     }
+
+    // Acceder al resultado
+    const totalUnicos = results[0] ? results[0].totalUnicos : 0;
+
+    // Enviar el resultado como respuesta
+    res.status(200).json({ total: totalUnicos });
   });
 });
 
 
-
-
-
-app.get('/combos', (req, res) => {
-  // Query para seleccionar todos los datos del menú
-  const query = "SELECT * FROM `combos`";
-
-  // Ejecutar la consulta
-  db.query(query, (error, results) => {
-    if (error) {
-      console.error('Error al obtener datos del menú:', error);
-      res.status(500).json({ error: 'Error al obtener datos del menú' });
-    } else {
-      // Enviar los resultados como respuesta
-      res.status(200).json(results);
-    }
-  });
-});
 
 app.get('/tiposmenu', (req, res) => {
   // Query para seleccionar todos los datos del menú
@@ -590,6 +566,187 @@ app.put('/reducir-stockMayor', (req, res) => {
       res.json({ message: "StockG reducido exitosamente" });
   });
 });
+
+
+///////////////////////
+
+app.put('/aumentar-stock', (req, res) => {
+  const { id_menu, id_dia, cantidad } = req.body;
+
+  if (!id_menu || !id_dia || !cantidad) {
+      return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
+  }
+
+  const query = `
+      UPDATE semana 
+      SET stockD = stockD + ? 
+      WHERE id_menu = ? AND id_dia = ?;
+  `;
+
+  db.query(query, [cantidad, id_menu, id_dia], (err, result) => {
+      if (err) {
+          return res.status(500).json({ error: "Error al actualizar el stock" });
+      }
+
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ error: "No se encontró el registro" });
+      }
+
+      res.json({ message: "StockD aumentado exitosamente" });
+  });
+});
+
+
+app.put('/aumentar-stockMayor', (req, res) => {
+  const { id, cantidad } = req.body;
+
+  if (!id || !cantidad) {
+      return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
+  }
+
+  const query = `
+      UPDATE menu 
+      SET stockG = stockG + ? 
+      WHERE id = ?;
+  `;
+
+  db.query(query, [cantidad, id], (err, result) => {
+      if (err) {
+          return res.status(500).json({ error: "Error al actualizar el stock" });
+      }
+
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ error: "No se encontró el registro" });
+      }
+
+      res.json({ message: "StockG aumentado exitosamente" });
+  });
+});
+
+
+app.put('/actualizar-estado', (req, res) => {
+  const { barra, estado } = req.body;
+
+  // Validación de parámetros
+  if (!barra || !estado) {
+    return res.status(400).json({ message: 'Faltan parámetros' });
+  }
+
+  // Consulta SQL para actualizar el estado del pedido
+  const query = 'UPDATE pedidos SET estado = ? WHERE barra = ?';
+  db.query(query, [estado, barra], (err, result) => {
+    if (err) {
+      // Manejo de errores en la consulta
+      console.error('Error al actualizar estado:', err);
+      return res.status(500).json({ message: 'Error al actualizar el estado' });
+    }
+
+    // Respuesta exitosa
+    res.status(200).json({ message: 'Estado actualizado con éxito' });
+  });
+});
+
+
+app.get('/datoscombos', (req, res) => {
+  // Query para seleccionar todos los datos del menú
+  const query = "SELECT * FROM `combos`";
+
+  // Ejecutar la consulta
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error('Error al obtener datos del combos:', error);
+      res.status(500).json({ error: 'Error al obtener datos del combos' });
+    } else {
+      // Enviar los resultados como respuesta
+      res.status(200).json(results);
+    }
+  });
+});
+
+
+app.put('/actualizar-precioCombo', (req, res) => {
+  const { idcombo, nuevoPrecio } = req.body;
+
+  // Validación de parámetros
+  if (!idcombo || !nuevoPrecio) {
+    return res.status(400).json({ message: 'Faltan parámetros' });
+  }
+
+  // Consulta SQL para actualizar el precio del combo
+  const query = 'UPDATE combos SET Precio = ? WHERE idcombo = ?';
+  db.query(query, [nuevoPrecio, idcombo], (err, result) => {
+    if (err) {
+      // Manejo de errores en la consulta
+      console.error('Error al actualizar precio del combo:', err);
+      return res.status(500).json({ message: 'Error al actualizar el precio' });
+    }
+
+    // Respuesta exitosa
+    res.status(200).json({ message: 'Precio del combo actualizado con éxito' });
+  });
+});
+
+app.post('/crear-combo', (req, res) => {
+  const {
+    tipo_combo,
+    proteina,
+    acompana,
+    acompanaG,
+    guiso,
+    postre,
+    ensaladaC,
+    ensaladaG,
+    papasC,
+    papasG,
+    bebida,
+    Precio
+  } = req.body;
+
+  // SQL query to insert a new combo
+  const query = `
+    INSERT INTO combos (
+      tipo_combo, proteina, acompana, acompanaG, guiso, postre,
+      ensaladaC, ensaladaG, papasC, papasG, bebida, Precio
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  // Execute the query
+  db.query(query, [
+    tipo_combo, proteina, acompana, acompanaG, guiso, postre,
+    ensaladaC, ensaladaG, papasC, papasG, bebida, Precio
+  ], (error, results) => {
+    if (error) {
+      console.error('Error al insertar en la base de datos:', error);
+      res.status(500).json({ error: 'Error al insertar en la base de datos' });
+    } else {
+      res.status(200).json({ message: 'Combo creado correctamente' });
+    }
+  });
+});
+
+app.put('/actualizar-comentario', (req, res) => {
+  const { idPedido, nuevoComentario } = req.body;
+
+  // Validación de parámetros
+  if (!idPedido || nuevoComentario === undefined) {
+    return res.status(400).json({ message: 'Faltan parámetros' });
+  }
+
+  // Consulta SQL para actualizar el comentario del pedido
+  const query = 'UPDATE pedidos SET comentario = ? WHERE id = ?';
+  db.query(query, [nuevoComentario, idPedido], (err, result) => {
+    if (err) {
+      // Manejo de errores en la consulta
+      console.error('Error al actualizar comentario del pedido:', err);
+      return res.status(500).json({ message: 'Error al actualizar el comentario' });
+    }
+
+    // Respuesta exitosa
+    res.status(200).json({ message: 'Comentario del pedido actualizado con éxito' });
+  });
+});
+
+
+
 
 
 

@@ -60,11 +60,15 @@ export const createAndPrintPDF = (ListaMayor, barra) => {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.text(`Orden: ${pedido.textoOrden}`, 10, yPosition);
+    doc.text(`Orden: `, 10, yPosition);
+    yPosition += 5;
+    doc.text(`${pedido.textoOrden}`, 10, yPosition);
     yPosition += 5;
     doc.text(`Cantidad: ${pedido.cantidad}`, 10, yPosition);
     yPosition += 5;
-    doc.text(`Comentario: ${pedido.Comentario || 'N/A'}`, 10, yPosition);
+    doc.text(`Comentario: `, 10, yPosition);
+    yPosition += 5;
+    doc.text(`${pedido.Comentario || 'N/A'}`, 10, yPosition);
     yPosition += 5;
     doc.text(`Precio: $${Math.round(pedido.precio)}`, 10, yPosition);
     yPosition += 8;
@@ -74,6 +78,7 @@ export const createAndPrintPDF = (ListaMayor, barra) => {
 
   // Añadir el precio total
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
   doc.text(`TOTAL: $${totalPrice.toFixed(0)}`, 10, yPosition);
   yPosition += 10;
 

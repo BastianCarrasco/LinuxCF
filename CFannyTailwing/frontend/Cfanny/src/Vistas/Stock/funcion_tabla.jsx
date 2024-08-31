@@ -94,16 +94,16 @@ const MenuTable = ({ datosMenu, handleEliminarItem }) => {
             <table className="min-w-full divide-y divide-gray-200 border-solid table-fixed">
               <thead className="bg-gray-800 sticky top-0">
                 <tr>
-                  <th style={{ width: "25%" }} className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th style={{ width: "25%",fontSize:"25px" }} className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th style={{ width: "25%" }} className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th style={{ width: "25%" ,fontSize:"25px"}} className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Precio
                   </th>
-                  <th style={{ width: "25%" }} className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th style={{ width: "25%" ,fontSize:"25px"}} className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Stock
                   </th>
-                  <th style={{ width: "25%" }} className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th style={{ width: "25%" ,fontSize:"25px"}} className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
@@ -111,15 +111,15 @@ const MenuTable = ({ datosMenu, handleEliminarItem }) => {
               <tbody className="bg-black divide-y divide-gray-200">
                 {datosFiltrados.map(item => (
                   <tr key={item.id} className="text-white">
-                    <td className="px-6 py-4 whitespace-nowrap">{item.nombre}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.precio}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.stockG}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td style={{fontSize:"25px", textAlign:"left"}} className="px-6 py-4 whitespace-nowrap">{item.nombre}</td>
+                    <td style={{fontSize:"25px", textAlign:"left"}} className="px-6 py-4 whitespace-nowrap">${item.precio}</td>
+                    <td style={{fontSize:"25px", textAlign:"left"}}className="px-6 py-4 whitespace-nowrap">{item.stockG}</td>
+                    <td style={{fontSize:"25px", textAlign:"left"}}className="px-6 py-4 whitespace-nowrap">
                       <button
                         onClick={() => handleEliminarItem(item.nombre)}
                         className="text-red-600 hover:text-red-800 focus:outline-none"
                       >
-                        <AiOutlineDelete size={25} />
+                        <AiOutlineDelete size={30} />
                       </button>
                     </td>
                   </tr>

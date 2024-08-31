@@ -26,7 +26,7 @@ const Semana = () => {
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen bg-black text-white p-6" style={{ paddingTop: '50px' }}>
-      <h3 className="text-2xl font-bold mb-4">Semana</h3>
+      {/* <h3 className="text-2xl font-bold mb-4">Semana</h3> */}
 
       {/* Renderizar las 6 tablas en una sola fila */}
       <div className="flex flex-wrap justify-center w-full overflow-x-auto">

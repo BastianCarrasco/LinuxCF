@@ -1,27 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 import { actualizarMenu } from '../Consultas/UPDATE/editarStockG';
+import { obtenerDatosTiposMenu } from '../Consultas/GET/gettiposMenu';
 
 export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
   const [datosMenu, setDatosMenu] = useState([]);
   const [datosModificados, setDatosModificados] = useState([]);
   const [filtroTipo, setFiltroTipo] = useState(null); // Estado para almacenar el tipo seleccionado
   const [filtroNombre, setFiltroNombre] = useState(''); // Estado para almacenar el nombre a filtrar
-  const [tablaVisible, setTablaVisible] = useState(false); // Estado para controlar la visibilidad de la tabla
+  const [tiposMenu, setTiposMenu] = useState([]);
+  const [tiposDisponibles, setTiposDisponibles] = useState([]); // Estado para almacenar los tipos disponibles
+
+  // Agregar los tipos prohibidos aquí
+  const tiposProhibidos = [1, 2, 4, 10, 3, 12];
 
   useEffect(() => {
-    // Función para obtener los datos del menú
+    // Función para obtener los datos del menú y tipos disponibles
     const fetchData = async () => {
       try {
         const data = await obtenerDatosMenu();
         setDatosMenu(data);
+
         // Inicializar datosModificados con los datos originales
         setDatosModificados(data.map(item => ({
           id: item.id,
           nombre: item.nombre,
           precio: item.precio,
-          stockG: item.stockG
+          stockG: item.stockG,
+          tipo: item.tipo
         })));
+
+        // Obtener los tipos disponibles
+        const tipos = Array.from(new Set(data.map(item => item.tipo))); // Obtiene tipos únicos
+        const tiposFiltrados = tipos.filter(tipo => !tiposProhibidos.includes(tipo)); // Filtra tipos prohibidos
+        setTiposDisponibles(tiposFiltrados);
+
       } catch (error) {
         console.error('Error al obtener datos del menú:', error);
       }
@@ -29,6 +42,36 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
 
     fetchData(); // Llama a la función para cargar los datos al montar el componente
   }, []);
+
+  function buscar_por_tipo(tipo) {
+    // Check if tiposMenu is defined and is an array
+    if (!Array.isArray(tiposMenu)) {
+      console.error('tiposMenu no es un array o no está definido.');
+      return '';
+    }
+
+    // Find the item with the given tipo
+    const item = tiposMenu.find(element => element.id_tipo === tipo);
+
+    // Return the name or a default value if not found
+    return item ? item.nombre : 'Tipo no encontrado';
+  }
+
+
+
+  useEffect(() => {
+    // Obtener los datos de tipos de menú al montar el componente
+    obtenerDatosTiposMenu()
+      .then(data => {
+        setTiposMenu(data);
+        console.log('Datos de tipos de menú:', data); // Imprime los datos obtenidos
+      })
+      .catch(error => console.error('Error al obtener datos de tipos de menú:', error));
+  }, []);
+
+
+
+
 
   // Función para manejar el cambio de un atributo
   const handleInputChange = (id, campo, valor) => {
@@ -59,9 +102,9 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
     }
   };
 
-  // Función para filtrar por tipo
-  const filtrarPorTipo = (tipo) => {
-    setFiltroTipo(tipo);
+  // Función para manejar el cambio en el filtro de tipo
+  const handleTipoFilterChange = (e) => {
+    setFiltroTipo(Number(e.target.value)); // Convertir el valor a número
   };
 
   // Función para manejar el cambio en el filtro de nombre
@@ -72,51 +115,64 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
   // Aplicar filtro si hay uno seleccionado
   const datosFiltrados = datosMenu
     .filter(item => filtroTipo ? item.tipo === filtroTipo : true)
+    .filter(item => !tiposProhibidos.includes(item.tipo)) // Filtrar tipos prohibidos
     .filter(item => item.nombre.toLowerCase().includes(filtroNombre.toLowerCase()));
 
   // Función para alternar la visibilidad de la tabla
-  const toggleTablaVisible = () => {
-    setTablaVisible(!tablaVisible);
-    setTodoOculto(!tablaVisible);
-  };
+
 
   return (
     <div className="w-full bg-black p-4 rounded shadow-md border-white">
       <div className="bg-black">
         <div className="flex flex-col mb-4">
-          <div className="flex space-x-4 mb-4">
-            <button onClick={() => filtrarPorTipo(5)} className="text-white hover:underline">Bebidas</button>
-            <button onClick={() => filtrarPorTipo(6)} className="text-white hover:underline">Ensalada</button>
-            <button onClick={() => filtrarPorTipo(7)} className="text-white hover:underline">Postre</button>
-            <button onClick={() => filtrarPorTipo(8)} className="text-white hover:underline">Otro</button>
-            <button onClick={() => filtrarPorTipo(9)} className="text-white hover:underline">Special</button>
+          <div style={{ marginTop: "50px" }} className="flex items-center mb-4">
+            <input
+              type="text"
+              value={filtroNombre}
+              onChange={handleNombreFilterChange}
+              placeholder="Filtrar por nombre"
+              className="px-3 py-2 border border-gray-300 rounded text-black mr-4"
+            />
+            <select
+              value={filtroTipo || ''}
+              onChange={handleTipoFilterChange}
+              className="px-3 py-2 border border-gray-300 rounded text-black mr-4"
+            >
+              <option value="">Seleccionar Tipo</option>
+              {tiposDisponibles.map(tipo => (
+                <option key={tipo} value={tipo} style={{ color: 'black' }}>
+                  {buscar_por_tipo(tipo).toUpperCase()}
+                </option>
+              ))}
+            </select>
+
+
+            <button
+              onClick={actualizarTodosLosDatos}
+              className="bg-green-500 text-white font-bold py-2 px-4 rounded"
+            >
+              Actualizar Todos los Datos
+            </button>
           </div>
-          <input
-            type="text"
-            value={filtroNombre}
-            onChange={handleNombreFilterChange}
-            placeholder="Filtrar por nombre"
-            className="px-3 py-2 border border-gray-300 rounded text-black mb-4"
-          />
-          <div className="max-h-96 overflow-y-auto border border-gray-300">
+          <div className="max-h-100 overflow-y-auto border border-gray-300">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-black">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th style={{fontSize:"25px"}} scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th style={{fontSize:"25px"}}scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Precio
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th style={{fontSize:"25px"}}scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Stock
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-black divide-y divide-gray-200">
+              <tbody className="bg-black divide-y divide-gray-300">
                 {datosFiltrados.map(item => (
                   <tr key={item.id} className="text-white">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td style={{fontSize:"20px"}}className="px-6 py-4 whitespace-nowrap">
                       {item.nombre}<br />
                       <input
                         type="text"
@@ -126,7 +182,7 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
                         placeholder="Modificar Nombre"
                       />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td  style={{fontSize:"20px"}}className="px-6 py-4 whitespace-nowrap">
                       {item.precio}<br />
                       <input
                         type="text"
@@ -136,7 +192,7 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
                         placeholder="Modificar Precio"
                       />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td style={{fontSize:"20px"}}className="px-6 py-4 whitespace-nowrap">
                       {item.stockG}<br />
                       <input
                         type="text"
@@ -153,13 +209,9 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
           </div>
         </div>
       </div>
-      {tablaVisible && (
-        <div className="flex justify-end mt-4">
-          <button onClick={actualizarTodosLosDatos} className="bg-green-500 text-white font-bold py-2 px-4 rounded">
-            Actualizar Todos los Datos
-          </button>
-        </div>
-      )}
     </div>
   );
 }
+
+
+

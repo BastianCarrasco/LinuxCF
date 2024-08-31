@@ -103,10 +103,18 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                     key={dato.id}
                     onClick={() => handleButtonClick(dato)}
                     className="p-2 border rounded hover:bg-gray-200"
-                    style={{ backgroundColor: "yellow", color: "black" }}
+                    style={{
+                        backgroundColor: dato.stockG === 0 || dato.stockD === 0
+                            ? "gray"
+                            : dato.stockG <= 5 || dato.stockD <= 5
+                                ? "red"
+                                : "yellow",
+                        color:  dato.stockD === 0 ? "white" : "black"
+                    }}
+                    disabled={dato.stockG === 0 || dato.stockD === 0}
                 >
                     {dato.nombre}<br></br>
-                    {dato.stockG}
+                
                     {dato.stockD}<br></br>
                 </button>
             ))}
@@ -116,11 +124,23 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                     key={dato.id}
                     onClick={() => handleButtonClick(dato)}
                     className="p-2 border rounded hover:bg-gray-200"
-                    style={{ backgroundColor: "orange", color: "black" }}
+                    style={{
+                        backgroundColor: dato.stockG === 0 || dato.stockD === 0
+                            ? "gray"
+                            : dato.stockG <= 5 || dato.stockD <= 5
+                                ? "red"
+                                : "orange",
+                        color: dato.stockG === 0 || dato.stockD === 0 ? "white" : "black"
+                    }}
+                    disabled={dato.stockG === 0 || dato.stockD === 0}
                 >
-                    {dato.nombre}<br></br>
-                    {dato.stockG}
-                    {dato.stockD}<br></br>
+                    {dato.stockG === 0 || dato.stockD === 0 ? "ACABADO" : (
+                        <>
+                            {dato.nombre}<br />
+                            
+                            {dato.stockD}<br />
+                        </>
+                    )}
                 </button>
             ))}
 
@@ -129,11 +149,24 @@ const ButtonList = ({ handleSelectData, dayName }) => {
                     key={dato.id}
                     onClick={() => handleButtonClick(dato)}
                     className="p-2 border rounded hover:bg-gray-200"
-                    style={{ backgroundColor: "lightgreen", color: "black" }}
+                    style={{
+                        backgroundColor: dato.stockG === 0 
+                            ? "lightgreen"
+                            : dato.stockG <= 5 || dato.stockD <= 5
+                                ? "red"
+                                : "lightgreen",
+                        color: "black"
+                    }}
+                    disabled={dato.stockG === 0 || dato.stockD === 0}
                 >
-                    {dato.nombre}<br></br>
-                    {dato.stockG}
-                    {dato.stockD}<br></br>
+                    {dato.stockG === 0 || dato.stockD === 0 ? "ACABADO" : (
+                        <>
+                            {dato.nombre}<br />
+                            {dato.stockG}<br />
+                           
+                        </>
+                    )}
+                 
                 </button>
             ))}
 
@@ -158,33 +191,49 @@ const ButtonList = ({ handleSelectData, dayName }) => {
             ))}
 
             {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                <div style={{scale:"120%"}} className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div style={{backgroundColor:"black"}} className="bg-white border-2 border-white p-4 rounded">
                         <h2 className="text-xl font-bold">Items del tipo {tipoToTitle[selectedTipo]}</h2>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {getUniqueButtons(datosSemana.filter(dato => dato.tipo === selectedTipo)).map((dato) => (
-                                <button
-                                    key={dato.id}
-                                    onClick={() => handleButtonClick(dato)}
-                                    className="p-2 border rounded hover:bg-gray-200"
-                                    style={{
-                                        backgroundColor:
-                                            selectedTipo === 4 ? "purple" :
-                                                selectedTipo === 5 ? "brown" :
-                                                    selectedTipo === 7 ? "teal" :
-                                                        selectedTipo === 8 ? "gray" :
-                                                            selectedTipo === 9 ? "indigo" : "lightgray",
-                                        color: "white",
-                                        width: "100%",
-                                    }}
-                                >
-                                    {dato.nombre}<br></br>
-                                    {dato.stockG}
-                                    {dato.stockD}<br></br>
-                                </button>
-                            ))}
-                        </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+    {getUniqueButtons(datosSemana.filter(dato => dato.tipo === selectedTipo)).map((dato) => (
+        <button
+            key={dato.id}
+            onClick={() => handleButtonClick(dato)}
+            className="p-2 border rounded hover:bg-gray-200"
+            style={{
+                backgroundColor: dato.stockG === 0 || dato.stockD === 0
+                    ? "gray"
+                    : dato.stockG <= 5 || dato.stockD <= 5
+                        ? "red"
+                        : selectedTipo === 4 ? "purple"
+                            : selectedTipo === 5 ? "brown"
+                                : selectedTipo === 7 ? "teal"
+                                    : selectedTipo === 8 ? "gray"
+                                        : selectedTipo === 9 ? "indigo" : "lightgray",
+                color: dato.stockG === 0 || dato.stockD === 0 ? "white" : "white",
+                width: "100%",
+            }}
+            disabled={dato.stockG === 0 || dato.stockD === 0}
+        >
+            {dato.stockG === 0 || dato.stockD === 0 ? "ACABADO" : (
+                <>
+                    {dato.nombre}<br />
+                    {dato.stockG !== null ? (
+                        <>
+                            {dato.stockG}
+                            {dato.stockD}
+                        </>
+                    ) : (
+                        dato.stockD
+                    )}
+                </>
+            )}
+        </button>
+    ))}
+</div>
+
+
 
                         <button onClick={handleCloseModal} className="mt-4 p-2 bg-cyan-500 text-white rounded">
                             Ok

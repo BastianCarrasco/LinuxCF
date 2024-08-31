@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DateTimeDisplay from './DateTimeDisplay';
 import ButtonList from './ButtonList';
-import SelectedDataTable from './SelectedDataTable';
+import SelectedDataTableTT from './SelectedDataTableTT';
 
 import { obtenerDatosCombos } from '../Consultas/GET/getCombos';
 import { obtenerDatosTiposMenu } from '../Consultas/GET/gettiposMenu';
@@ -12,9 +12,12 @@ import Boleta from './boleta';
 import { FaArrowRotateLeft } from "react-icons/fa6";
 import { numeroCliente } from '../Consultas/GET/numeroCliente';
 import { handleAgregarOrden } from './agregarOrden';
-import {tiempo} from './nombreDia'
 
-const Caja = () => {
+
+
+
+
+const Caja2 = () => {
   const [isBoletaOpen, setIsBoletaOpen] = useState(false);
   
   const [Cliente, setCliente] = useState(localStorage.getItem('Cliente') || null); // Inicializa el estado del filtro desde localStorage
@@ -48,14 +51,14 @@ const Caja = () => {
     }
   };
 
-  const fetchData = async () => {
+  const numeroclienteCaja = async () => {
     const numero = await fetchNumeroCliente();
     console.log(numero)
     setNumeroOrden(numero + 1); // Asume que quieres incrementar el número en 1
   };
 
   useEffect(() => {
-    fetchData();
+    numeroclienteCaja();
   }, []);
 
 
@@ -162,27 +165,13 @@ const Caja = () => {
   const toggleComentario = (index, comentario) => {
     const nuevaListaMayor = [...ListaMayor];
     const item = nuevaListaMayor[index];
-
-    // Si el comentario ya existe, elimínalo
     if (item.comentario.includes(comentario)) {
-        // Eliminar el comentario y también limpiar saltos de línea redundantes
-        item.comentario = item.comentario
-            .split('\n') // Dividir los comentarios en líneas
-            .filter(linea => linea.trim() !== comentario.trim()) // Filtrar el comentario específico
-            .join('\n') // Volver a unir los comentarios con saltos de línea
-            .trim(); // Eliminar cualquier espacio en blanco al inicio y al final
+      item.comentario = item.comentario.replace(comentario, '').trim();
     } else {
-        // Si ya hay comentarios, agregar un salto de línea antes del nuevo comentario
-        if (item.comentario.trim() === '') {
-            item.comentario = comentario;
-        } else {
-            item.comentario = `${item.comentario}\n${comentario}`.trim();
-        }
+      item.comentario = `${item.comentario} ${comentario}`.trim();
     }
-
     setListaMayor(nuevaListaMayor);
-};
-
+  };
 
 
 
@@ -290,16 +279,27 @@ const Caja = () => {
     }
   }, [contadorTipos]);
 
- 
   useEffect(() => {
-    // Función que llama a `tiempo` con los setters de estado
-    const updateDateTime = () => tiempo(setDayName, setCurrentDate);
+    const updateDateTime = () => {
+      const now = new Date();
+      setCurrentDate(now);
+      const dayNames = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+      // Obtén el nombre del día actual
+      let dayName = dayNames[now.getDay()];
 
-    updateDateTime(); // Inicializa el estado al montar el componente
-    const timerId = setInterval(updateDateTime, 1000); // Llama a `updateDateTime` cada segundo
+      // Ajusta el nombre del día si es domingo
+      if (dayName === 'DOMINGO') {
+        dayName = 'LUNES';
+      }
 
-    return () => clearInterval(timerId); // Limpia el intervalo al desmontar el componente
-}, []);
+      setDayName(dayName);
+    };
+
+    updateDateTime();
+    const timerId = setInterval(updateDateTime, 1000);
+
+    return () => clearInterval(timerId);
+  }, []);
 
 
   useEffect(() => {
@@ -367,12 +367,12 @@ const Caja = () => {
 
 
   return (
-    <div className="flex flex-col w-full min-h-screen">
+    <div style={{scale:"100%", maxWidth:"100%" }} className="flex flex-col  min-h-screen  ">
       <div className="w-full p-4">
 
         {/* TOP */}
         <div style={{ border: "solid" }} className="flex justify-between">
-          <div style={{ marginTop: "40px" }} className="w-1/2">
+          <div style={{ marginTop: "40px" }} className="w-4/6">
             <div className="flex items-center justify-between">
               <button style={{ fontSize: "24px" }} onClick={borrarListaMayor} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
                 Cancelar
@@ -417,25 +417,33 @@ const Caja = () => {
           </div>
 
 
-          <div className="w-1/2 flex flex-col ">
-            <DateTimeDisplay dayName={dayName} currentDate={currentDate} />
-            <button style={{ fontSize: "24px", maxWidth:'50%',marginLeft:'300px' }} onClick={agregarOrden} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+          <div className="w-2/6 flex flex-col ">
+            {/* <DateTimeDisplay dayName={dayName} currentDate={currentDate} /> */}
+            <button style={{ fontSize: "18px", maxWidth:'70%',marginLeft:'60px', marginTop:"20px" }} onClick={agregarOrden} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
               Agregar Orden
             </button><br></br>
             <button
-              type="button"
-              className="bg-orange-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-              onClick={handleOpenBoleta}
-              style={{ fontSize: "24px", marginTop:'20px', maxWidth:'50%',marginLeft:'300px' }}
-            >
-              Crear Orden
-            </button><br></br>
+  type="button"
+  className="bg-orange-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+  onClick={() => {
+    if (Cliente !== null) {
+      handleOpenBoleta();
+    } else {
+      // Aquí puedes mostrar un mensaje de error o realizar otra acción si lo deseas
+      console.log("El cliente no está definido.");
+    }
+  }}
+  style={{ fontSize: "18px", marginTop: '20px', maxWidth: '70%', marginLeft: '60px' }}
+>
+  Crear Orden
+</button>
+<br></br>
 
             <button
               type="button"
               className="bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
               onClick={verBarra}
-              style={{ fontSize: "24px", marginTop:'20px',marginLeft:'300px', maxWidth:'50%' }}
+              style={{ fontSize: "18px", marginTop:'20px',marginLeft:'60px', maxWidth:'70%' }}
             >
               Crear Pedido
             </button>
@@ -449,7 +457,7 @@ const Caja = () => {
                 onChange={handleInputChange}
                 placeholder="INGRESE NOMBRE DE CLIENTE"
                 className="mb-4 p-2 border border-gray-300 rounded"
-                style={{ fontSize: "18px", color: "black", marginTop:'10px', maxWidth:'50%', textAlign:'center',marginLeft:'300px' }}
+                style={{ fontSize: "18px", color: "black", marginTop:'10px', maxWidth:'80%', textAlign:'center',marginLeft:'50px' }}
               />
             )}
 
@@ -475,12 +483,12 @@ const Caja = () => {
         </div>
 
         {/* BOTTOM */}
-        <div className="mt-4">
-          <SelectedDataTable
+        <div style={{fontSize:"10px",scale:"100%", maxWidth:'100%', marginLeft:"-0px"}} className="mt-4">
+          <SelectedDataTableTT
             ListaMayor={ListaMayor}
             setListaMayor={setListaMayor}
             eliminarFila={eliminarFila}
-            toggleComentario={toggleComentario}
+            toggleComentario={[]}
             dayName={dayName}
           />
         </div>
@@ -492,4 +500,4 @@ const Caja = () => {
   );
 };
 
-export default Caja;
+export default Caja2;

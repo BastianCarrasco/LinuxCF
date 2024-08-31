@@ -5,7 +5,6 @@ import { link } from '../servidor';
 export const actualizarEstadoPedido = async (barra, nuevoEstado) => {
   try {
     // Establece el nuevo estado a 1
-    
 
     // Realiza la solicitud PUT al servidor con el código de barra y el nuevo estado
     const response = await axios.put(`http://${link}:5150/actualizar-estado`, {

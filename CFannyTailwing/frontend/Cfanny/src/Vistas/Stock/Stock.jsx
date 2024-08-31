@@ -4,18 +4,25 @@ import NuevoItem from './ingresarItem';
 import DatosIngresados from './DatosIngresados';
 import MenuTable from './funcion_tabla';
 import { eliminarMenu } from '../Consultas/DELETE/elminarMenu';
+import Combos from './combos';
+import CrearCombos from './Crearcombos';
 
 export default function Stock() {
   const [datosMenu, setDatosMenu] = useState([]);
-  const [activeTab, setActiveTab] = useState(null); // Estado para controlar qué mostrar
+  const [activeTab, setActiveTab] = useState('menu'); // Estado para controlar qué mostrar
 
-  useEffect(() => {
-    // Obtener datos del menú al montar el componente
+  // Función para obtener datos del menú
+  function datosMenuStock() {
     obtenerDatosMenu()
       .then(data => setDatosMenu(data))
       .catch(error => console.error('Error al obtener datos del menú:', error));
+  }
+  
+  useEffect(() => {
+    // Obtener datos del menú al montar el componente
+    datosMenuStock(); // Llama a la función aquí, usando paréntesis para ejecutar la función
   }, []);
-
+  
   // Función para eliminar un ítem del menú
   const handleEliminarItem = async (nombre) => {
     try {
@@ -41,20 +48,33 @@ export default function Stock() {
     setActiveTab('editarStock');
   };
 
+  // Función para mostrar el componente de combos
+  const handleShowCombos = () => {
+    setActiveTab('combos');
+  };
+
+  // Función para mostrar el componente de crear combos
+  const handleShowcrearCombos = () => {
+    setActiveTab('crearcombos');
+  };
+
+  // Función para renderizar el contenido basado en el estado activeTab
   const renderContent = () => {
     switch (activeTab) {
       case 'menu':
         return <MenuTable datosMenu={datosMenu} handleEliminarItem={handleEliminarItem} />;
       case 'ingresarItem':
-        return <NuevoItem />;
+        return <NuevoItem datosMenuStock={datosMenuStock} />;
       case 'editarStock':
         return <DatosIngresados />;
+      case 'combos':
+        return <Combos />;
+      case 'crearcombos':
+        return <CrearCombos />;
       default:
         return <div>Selecciona una opción</div>;
     }
   };
-
-  
 
   return (
     <div className="flex w-screen h-screen bg-black text-white">
@@ -77,9 +97,24 @@ export default function Stock() {
         <button 
           style={{width: "100%", padding: "12px 0"}}
           onClick={handleShowDatosIngresados}
-          className="bg-yellow-500 text-black px-4 py-2 rounded"
+          className="bg-yellow-500 text-black px-4 py-2 rounded mb-4"
         >
           Editar Stock
+        </button>
+        <button 
+          style={{width: "100%", padding: "12px 0"}}
+          onClick={handleShowCombos}
+          className="bg-yellow-500 text-black px-4 py-2 rounded mb-4"
+        >
+          Combos
+        </button>
+
+        <button 
+          style={{width: "100%", padding: "12px 0"}}
+          onClick={handleShowcrearCombos}
+          className="bg-yellow-500 text-black px-4 py-2 rounded"
+        >
+          Crear Combos
         </button>
       </div>
       {/* Columna derecha (90%) */}
@@ -90,3 +125,4 @@ export default function Stock() {
     </div>
   );
 }
+
