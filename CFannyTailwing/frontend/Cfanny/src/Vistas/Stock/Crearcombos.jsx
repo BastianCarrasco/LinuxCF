@@ -17,14 +17,14 @@ export default function CrearCombos() {
     bebida: '0',
     Precio: '0',
   });
-  const [error, setError] = useState(''); // State for error message
+  const [error, setError] = useState('');
+  const [combosExistentes, setCombosExistentes] = useState([]);
 
-  // Fetch combo data when the component mounts
   useEffect(() => {
     const fetchCombos = async () => {
       try {
-        await obtenerDatosCombos();
-        // You can use this data if needed for other functionalities
+        const combos = await obtenerDatosCombos();
+        setCombosExistentes(combos);
       } catch (error) {
         console.error('Error fetching combo data:', error);
       }
@@ -33,28 +33,33 @@ export default function CrearCombos() {
     fetchCombos();
   }, []);
 
-  // Handle form field changes
   const handleChange = (event) => {
     const { name, value } = event.target;
-    if (name === 'tipo_combo') {
-      // Allow any string value for tipo_combo
-      setFormValues(prevValues => ({
-        ...prevValues,
-        [name]: value
-      }));
-    } else {
-      // Ensure the value is an integer if the field is numeric
-      const isNumeric = name !== 'tipo_combo';
-      setFormValues(prevValues => ({
-        ...prevValues,
-        [name]: isNumeric ? value.replace(/[^0-9]/g, '') : value
-      }));
-    }
+    const isNumeric = name !== 'tipo_combo';
+    setFormValues(prevValues => ({
+      ...prevValues,
+      [name]: isNumeric ? value.replace(/[^0-9]/g, '') : value
+    }));
   };
 
-  // Handle saving the new combo data
+  const verificarDuplicado = () => {
+    return combosExistentes.some(combo =>
+      combo.tipo_combo === formValues.tipo_combo &&
+      combo.proteina === formValues.proteina &&
+      combo.acompana === formValues.acompana &&
+      combo.acompanaG === formValues.acompanaG &&
+      combo.guiso === formValues.guiso &&
+      combo.postre === formValues.postre &&
+      combo.ensaladaC === formValues.ensaladaC &&
+      combo.ensaladaG === formValues.ensaladaG &&
+      combo.papasC === formValues.papasC &&
+      combo.papasG === formValues.papasG &&
+      combo.bebida === formValues.bebida &&
+      combo.Precio === formValues.Precio
+    );
+  };
+
   const handleSave = async () => {
-    // Convert form values to integers where appropriate
     const integerValues = {
       proteina: parseInt(formValues.proteina, 10) || 0,
       acompana: parseInt(formValues.acompana, 10) || 0,
@@ -69,7 +74,6 @@ export default function CrearCombos() {
       Precio: parseInt(formValues.Precio, 10) || 0,
     };
 
-    // Check if any required field is missing or invalid
     if (Object.values(integerValues).some(value => isNaN(value))) {
       setError('Por favor, complete todos los campos con valores enteros válidos.');
       return;
@@ -80,12 +84,28 @@ export default function CrearCombos() {
       return;
     }
 
-    setError(''); // Clear any previous error message
-    console.log(formValues)
+    const nonZeroAttributes = Object.values(integerValues).filter(value => value !== 0);
+
+    if (nonZeroAttributes.length < 2) {
+      setError('Debe haber al menos dos atributos con valores distintos de 0.');
+      return;
+    }
+
+    if (verificarDuplicado()) {
+      setError('Esta combinación ya existe.');
+      return;
+    }
+
+    if (integerValues.Precio === 0) {
+      setError('El precio no puede ser 0.');
+      return;
+    }
+
+    setError('');
+
     try {
-      // Create the new combo data
       await insertarCombo(
-        formValues.tipo_combo, // Include tipo_combo in the data sent to the backend
+        formValues.tipo_combo,
         integerValues.proteina,
         integerValues.acompana,
         integerValues.acompanaG,
@@ -97,10 +117,8 @@ export default function CrearCombos() {
         integerValues.papasG,
         integerValues.bebida,
         integerValues.Precio
-       
       );
 
-      // Optionally, refetch or reset form values after saving
       console.log('Nuevo combo creado:', { ...integerValues, tipo_combo: formValues.tipo_combo });
       setFormValues({
         tipo_combo: '',
@@ -124,26 +142,45 @@ export default function CrearCombos() {
 
   return (
     <div className="w-full p-4 bg-black text-white min-h-screen">
-      {/* Form to create a new combo */}
       <div className="mt-4 flex flex-col items-center justify-center bg-gray-800 p-6 rounded-lg shadow-lg">
         <h3 className="text-2xl font-bold mb-4 text-center">CREAR NUEVO COMBO</h3>
-        <div className="flex flex-col space-y-4 w-full max-w-md">
-          {Object.keys(formValues).map((key) => (
-            <div key={key} className="flex flex-col mb-4">
-              <label className="text-lg font-semibold mb-1 uppercase">
-                {key.replace(/([A-Z])/g, ' $1').toUpperCase()}:
-              </label>
-              <input
-                type={key === 'Precio' ? 'number' : 'text'} // Use 'number' type for Precio
-                name={key}
-                className="border border-gray-600 rounded p-2 text-lg bg-gray-700 text-white"
-                value={formValues[key]}
-                onChange={handleChange}
-                min={key === 'Precio' ? '0' : undefined} // Ensure non-negative numbers for Precio
-                step={key === 'Precio' ? '1' : undefined} // Ensure only integers are accepted for Precio
-              />
-            </div>
-          ))}
+        <div className="flex flex-wrap justify-between space-y-4 w-full max-w-lg">
+          <div className="w-full md:w-1/2 pr-2">
+            {Object.keys(formValues).slice(0, 6).map((key) => (
+              <div key={key} className="flex flex-col mb-4">
+                <label className="text-lg font-semibold mb-1 uppercase">
+                  {key.replace(/([A-Z])/g, ' $1').toUpperCase()}:
+                </label>
+                <input
+                  type={key === 'Precio' ? 'number' : 'text'}
+                  name={key}
+                  className="border border-gray-600 rounded p-2 text-lg bg-gray-700 text-white"
+                  value={formValues[key]}
+                  onChange={handleChange}
+                  min={key === 'Precio' ? '1' : undefined}
+                  step={key === 'Precio' ? '1' : undefined}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="w-full md:w-1/2 pl-2">
+            {Object.keys(formValues).slice(6).map((key) => (
+              <div key={key} className="flex flex-col mb-4">
+                <label className="text-lg font-semibold mb-1 uppercase">
+                  {key.replace(/([A-Z])/g, ' $1').toUpperCase()}:
+                </label>
+                <input
+                  type={key === 'Precio' ? 'number' : 'text'}
+                  name={key}
+                  className="border border-gray-600 rounded p-2 text-lg bg-gray-700 text-white"
+                  value={formValues[key]}
+                  onChange={handleChange}
+                  min={key === 'Precio' ? '1' : undefined}
+                  step={key === 'Precio' ? '1' : undefined}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {error && (
