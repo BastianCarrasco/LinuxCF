@@ -1,12 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBreadSlice, faIceCream, faWineBottle } from '@fortawesome/free-solid-svg-icons';
+import { faBreadSlice, faIceCream, faWineBottle, faFile } from '@fortawesome/free-solid-svg-icons';
 import { obtenerDatosSemana } from '../Consultas/GET/getDatosSemana';
 import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 
 const SelectedDataTable = ({ ListaMayor, setListaMayor, eliminarFila, toggleComentario, dayName }) => {
     const [datosSemana, setDatosSemana] = useState([]);
     const [datosMenu, setDatosMenu] = useState([]);
+
+    function editar(indice) {
+        let comentario_actual = ListaMayor[indice].comentario;
+        console.log(comentario_actual);
+
+        let nuevo_comentario = prompt("Edita el comentario:", comentario_actual);
+        if (nuevo_comentario !== null) {  // Verifica si el usuario no canceló la edición
+            let nuevaListaMayor = [...ListaMayor];
+            nuevaListaMayor[indice].comentario = nuevo_comentario;
+            setListaMayor(nuevaListaMayor); // Asume que tienes un estado setListaMayor
+        }
+    }
+
+
+
 
     function buscarStockG(x) {
     const encontrado = datosSemana.find(dato => dato.id === parseInt(x, 10));
@@ -77,7 +92,7 @@ const incrementarCantidad = (index) => {
 
 
 
-    
+
 
     const decrementarCantidad = (index) => {
         const nuevaListaMayor = [...ListaMayor];
@@ -213,10 +228,12 @@ const incrementarCantidad = (index) => {
                         <td style={{ fontSize: "30px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg">${item.precio}</td>
                         <td style={{ fontSize: "20px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg">{item.comentario}</td>
                         <td style={{ fontSize: "20px" }} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-lg space-x-2">
-                            <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-red-500 text-white rounded-full" onClick={() => eliminarFila(index)}>Eliminar</button>
+                        <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-green-500 text-white rounded-full" onClick={() => editar(index)}><FontAwesomeIcon icon={faFile} /></button>
+
                             <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Empanada')}>Pan  <FontAwesomeIcon icon={faBreadSlice} /></button>
                             <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Postre')}>Postre  <FontAwesomeIcon icon={faIceCream} /></button>
                             <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-blue-500 text-white rounded-full" onClick={() => toggleComentario(index, '- Se entrego Bebida')}>Bebida <FontAwesomeIcon icon={faWineBottle} /></button>
+                            <button style={{ fontSize: "26px" }} className="px-4 py-3 bg-red-500 text-white rounded-full" onClick={() => eliminarFila(index)}>Eliminar</button>
                         </td>
                     </tr>
                 ))}
