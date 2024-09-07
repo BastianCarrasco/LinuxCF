@@ -23,12 +23,12 @@ export const getCurrentDateInLatinoFormat = () => {
   return `${day}/${month}/${year}`;
 };
 
-export const createAndPrintPDF = (listaMayor, barra, precioTotal) => {
+export const createAndPrintPDF = (listaMayor, barra) => {
   const doc = new jsPDF({
     format: [80, 200],
   });
 
-  
+
 
   // Añadir título o logo opcional en la parte superior
   doc.setFontSize(10);
@@ -59,7 +59,7 @@ export const createAndPrintPDF = (listaMayor, barra, precioTotal) => {
     if (pedido.numeroOrden !== previousNumOrden) {
       doc.setFont('helvetica', 'bold');
       doc.text(`Número de Orden: ${pedido.numeroOrden}`, 10, yPosition);
-      previousNumOrden = pedido.numeroOrden;
+      previousNumOrden = pedido.numOrden;
       yPosition += 6;
     }
 
@@ -73,7 +73,7 @@ export const createAndPrintPDF = (listaMayor, barra, precioTotal) => {
     yPosition += 5;
     doc.text(`Comentario: '}`, 10, yPosition);
     yPosition += 5;
-    doc.text(`${pedido.Comentario || 'N/A'}`, 10, yPosition);
+    doc.text(`${pedido.comentario || 'N/A'}`, 10, yPosition);
     yPosition += 5;
     doc.text(`Precio: $${pedido.precio}`, 10, yPosition);
     yPosition += 8;
@@ -96,7 +96,7 @@ export const createAndPrintPDF = (listaMayor, barra, precioTotal) => {
   yPosition += 40;
 
   // Opcional: Footer
-  
+
 
   // Guardar e imprimir el PDF
   const pdfData = doc.output('datauristring');
@@ -105,6 +105,3 @@ export const createAndPrintPDF = (listaMayor, barra, precioTotal) => {
   link.download = 'boleta.pdf';
   link.click();
 };
-
-
-

@@ -16,7 +16,7 @@ import {tiempo} from './nombreDia'
 
 const Caja = () => {
   const [isBoletaOpen, setIsBoletaOpen] = useState(false);
-  
+
   const [Cliente, setCliente] = useState(localStorage.getItem('Cliente') || null); // Inicializa el estado del filtro desde localStorage
   const [showInput, setShowInput] = useState(false);
   const handleOpenBoleta = () => setIsBoletaOpen(true);
@@ -43,7 +43,7 @@ const Caja = () => {
       const total = response.total;
       return Number(total); // Convertir a número explícitamente
     } catch (error) {
-     
+
       return 0; // Retorna 0 en caso de error
     }
   };
@@ -124,7 +124,7 @@ const Caja = () => {
 
   const removeLastItem = () => {
     setSelectedData((prevData) => prevData.slice(0, -1));
-    
+
   };
 
 
@@ -216,16 +216,12 @@ const Caja = () => {
       setSelectedData([]);
      // console.log('Orden agregada:', ListaMayor);
     }
-    else{
-      if (selectedData.length===1){
-        
 
-      }
-    }
+
   }, [selectedData]);
 
 
-  
+
 
 
 
@@ -234,13 +230,13 @@ const Caja = () => {
   useEffect(() => {
     const concatenatedNames = textoOrden(selectedData);
     setTexto(concatenatedNames);
-    
+
   }, [selectedData]);
 
   useEffect(() => {
-  
+
     setPrecio(0);
-    
+
   }, []);
 
   useEffect(() => {
@@ -261,7 +257,7 @@ const Caja = () => {
 
   }, [selectedData, Tipos]);
 
- 
+
 
   useEffect(() => {
     const combo = Combos.find(
@@ -283,14 +279,14 @@ const Caja = () => {
     if (combo) {
       setPrecio(combo.Precio);
     //  console.log(`Precio encontrado: $${combo.Precio}`);
-    } 
+    }
     else {
       setPrecio(0);
     //  console.log('No se encontró un precio coincidente');
     }
   }, [contadorTipos]);
 
- 
+
   useEffect(() => {
     // Función que llama a `tiempo` con los setters de estado
     const updateDateTime = () => tiempo(setDayName, setCurrentDate);
@@ -332,11 +328,11 @@ const Caja = () => {
     const countTipo1 = selectedData.filter((item) => item.tipo === 1).length;
     const countTipo10 = selectedData.filter((item) => item.tipo === 10).length;
     const countTipo2 = selectedData.filter((item) => item.tipo === 2).length;
-  
+
     // Restricciones
     const maxTipo2 = 2;
     const maxTipo1or10 = 1;
-  
+
     if ((dato.tipo === 1 || dato.tipo === 10) && (countTipo1 + countTipo10 >= maxTipo1or10)) {
       window.alert(`Solo se permite una PROTEINA o un GUISO por pedido/colacion.`);
     } else if (dato.tipo === 2 && countTipo2 >= maxTipo2) {
@@ -345,8 +341,8 @@ const Caja = () => {
       setSelectedData([...selectedData, dato]);
     }
   };
-  
-  
+
+
   const agregarOrden = () => {
     handleAgregarOrden({
       selectedData,
@@ -389,7 +385,7 @@ const Caja = () => {
 
               <div className="flex-1 flex items-center">
                 <p style={{ fontSize: '24px', color: 'white' }}>
-                  ORDEN: {Texto} 
+                  ORDEN: {Texto}
                 </p>
 
 
@@ -439,10 +435,10 @@ const Caja = () => {
             >
               Crear Pedido
             </button>
-            
+
 
             {showInput && (
-             
+
               <input
                 type="text"
                 value={Cliente}

@@ -51,10 +51,12 @@ export const createAndPrintPDF = (ListaMayor, barra) => {
   let totalPrice = 0;
 
   ListaMayor.forEach((pedido) => {
-    if (pedido.NumOrden !== previousNumOrden) {
+    if (pedido.numeroOrden !== previousNumOrden) {
       doc.setFont('helvetica', 'bold');
-      doc.text(`Número de Orden: ${pedido.NumOrden}`, 10, yPosition);
-      previousNumOrden = pedido.NumOrden;
+      doc.text(`Número de Orden: ${pedido.numeroOrden}`, 10, yPosition);
+      previousNumOrden = pedido.numOrden;
+      yPosition += 6;
+      doc.text(`CLIENTE: ${pedido.cliente}`, 10, yPosition);
       yPosition += 6;
     }
 
@@ -68,7 +70,7 @@ export const createAndPrintPDF = (ListaMayor, barra) => {
     yPosition += 5;
     doc.text(`Comentario: `, 10, yPosition);
     yPosition += 5;
-    doc.text(`${pedido.Comentario || 'N/A'}`, 10, yPosition);
+    doc.text(`${pedido.comentario || 'N/A'}`, 10, yPosition);
     yPosition += 5;
     doc.text(`Precio: $${Math.round(pedido.precio)}`, 10, yPosition);
     yPosition += 8;
@@ -86,7 +88,7 @@ export const createAndPrintPDF = (ListaMayor, barra) => {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.text('¡Gracias por su preferencia!', 10, yPosition);
-  
+
   // Guardar e imprimir el PDF
   const pdfData = doc.output('datauristring');
   const link = document.createElement('a');
@@ -94,4 +96,3 @@ export const createAndPrintPDF = (ListaMayor, barra) => {
   link.download = 'boleta.pdf';
   link.click();
 };
-

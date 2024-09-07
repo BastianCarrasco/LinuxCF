@@ -17,6 +17,7 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root', // Usuario de la base de datos
+  // password: '', // Contraseña de la base de datos
   password: '5150', // Contraseña de la base de datos
   database: 'fannyLinux' // Nombre de la base de datos
 });
@@ -35,7 +36,7 @@ app.get('/menuNoEnSemana', (req, res) => {
   // Query para seleccionar todos los datos del menú
   const query = `
     SELECT menu.id, menu.nombre
-    FROM menu 
+    FROM menu
     LEFT JOIN semana ON semana.id_menu = menu.id
     WHERE semana.id_menu IS NULL;
   `;
@@ -72,7 +73,7 @@ app.get('/ventas', (req, res) => {
 app.get('/numeroCliente', (req, res) => {
   // Consulta para obtener la suma de los valores únicos de numeroOrden en ambas tablas
   const query = `
-    SELECT 
+    SELECT
       (SELECT COUNT(DISTINCT numeroOrden) FROM ventas) +
       (SELECT COUNT(DISTINCT numeroOrden) FROM pedidos) AS totalUnicos
   `;
@@ -329,10 +330,10 @@ function actualizarPreciosColacion(idColaciones, valor) {
 
 
 app.put('/actualizar-id-semana', (req, res) => {
-  const { p_id_dia,p_nuevo_id_menu,p_numero } = req.body;
+  const { p_id_dia, p_nuevo_id_menu, p_numero } = req.body;
 
   // Llamar a la función para actualizar precios_colaciones
-  actualizaridsemana(p_id_dia,p_nuevo_id_menu,p_numero)
+  actualizaridsemana(p_id_dia, p_nuevo_id_menu, p_numero)
     .then(results => {
       res.json({ message: 'Tabla id semana actualizada correctamente', results });
     })
@@ -343,12 +344,12 @@ app.put('/actualizar-id-semana', (req, res) => {
 });
 
 // Función para actualizar precios_colaciones
-function actualizaridsemana(p_id_dia,p_nuevo_id_menu,p_numero) {
+function actualizaridsemana(p_id_dia, p_nuevo_id_menu, p_numero) {
   return new Promise((resolve, reject) => {
     // Llamada al procedimiento almacenado
     db.query(
       'CALL actualizar_id_menu(?, ?, ?)',
-      [p_id_dia,p_nuevo_id_menu,p_numero],
+      [p_id_dia, p_nuevo_id_menu, p_numero],
       (error, results) => {
         if (error) {
           reject(error);
@@ -361,10 +362,10 @@ function actualizaridsemana(p_id_dia,p_nuevo_id_menu,p_numero) {
 }
 
 app.put('/actualizar-stock-semana', (req, res) => {
-  const { p_id_dia,p_id_menu,p_stockD} = req.body;
+  const { p_id_dia, p_id_menu, p_stockD } = req.body;
 
   // Llamar a la función para actualizar precios_colaciones
-  actualizarStoxksemana(p_id_dia,p_id_menu,p_stockD)
+  actualizarStoxksemana(p_id_dia, p_id_menu, p_stockD)
     .then(results => {
       res.json({ message: 'Tabla stock semana actualizada correctamente', results });
     })
@@ -375,12 +376,12 @@ app.put('/actualizar-stock-semana', (req, res) => {
 });
 
 // Función para actualizar precios_colaciones
-function actualizarStoxksemana(p_id_dia,p_id_menu,p_stockD) {
+function actualizarStoxksemana(p_id_dia, p_id_menu, p_stockD) {
   return new Promise((resolve, reject) => {
     // Llamada al procedimiento almacenado
     db.query(
       'CALL actualizar_stock(?, ?, ?)',
-      [p_id_dia,p_id_menu,p_stockD],
+      [p_id_dia, p_id_menu, p_stockD],
       (error, results) => {
         if (error) {
           reject(error);
@@ -517,51 +518,51 @@ app.put('/reducir-stock', (req, res) => {
   const { id_menu, id_dia, cantidad } = req.body;
 
   if (!id_menu || !id_dia || !cantidad) {
-      return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
+    return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
   }
 
   const query = `
-      UPDATE semana 
-      SET stockD = stockD - ? 
+      UPDATE semana
+      SET stockD = stockD - ?
       WHERE id_menu = ? AND id_dia = ? AND stockD >= ?;
   `;
 
   db.query(query, [cantidad, id_menu, id_dia, cantidad], (err, result) => {
-      if (err) {
-          return res.status(500).json({ error: "Error al actualizar el stock" });
-      }
+    if (err) {
+      return res.status(500).json({ error: "Error al actualizar el stock" });
+    }
 
-      if (result.affectedRows === 0) {
-          return res.status(404).json({ error: "No se encontró el registro o stock insuficiente" });
-      }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "No se encontró el registro o stock insuficiente" });
+    }
 
-      res.json({ message: "Stock reducido exitosamente" });
+    res.json({ message: "Stock reducido exitosamente" });
   });
 });
 
 app.put('/reducir-stockMayor', (req, res) => {
-  const { id,cantidad } = req.body;
+  const { id, cantidad } = req.body;
 
   if (!id || !cantidad) {
-      return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
+    return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
   }
 
   const query = `
-      UPDATE menu 
-      SET stockG = stockG - ? 
+      UPDATE menu
+      SET stockG = stockG - ?
       WHERE id = ? AND stockG >= ?;
   `;
 
   db.query(query, [cantidad, id, cantidad], (err, result) => {
-      if (err) {
-          return res.status(500).json({ error: "Error al actualizar el stock" });
-      }
+    if (err) {
+      return res.status(500).json({ error: "Error al actualizar el stock" });
+    }
 
-      if (result.affectedRows === 0) {
-          return res.status(404).json({ error: "No se encontró el registro o stock insuficiente" });
-      }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "No se encontró el registro o stock insuficiente" });
+    }
 
-      res.json({ message: "StockG reducido exitosamente" });
+    res.json({ message: "StockG reducido exitosamente" });
   });
 });
 
@@ -572,25 +573,25 @@ app.put('/aumentar-stock', (req, res) => {
   const { id_menu, id_dia, cantidad } = req.body;
 
   if (!id_menu || !id_dia || !cantidad) {
-      return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
+    return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
   }
 
   const query = `
-      UPDATE semana 
-      SET stockD = stockD + ? 
+      UPDATE semana
+      SET stockD = stockD + ?
       WHERE id_menu = ? AND id_dia = ?;
   `;
 
   db.query(query, [cantidad, id_menu, id_dia], (err, result) => {
-      if (err) {
-          return res.status(500).json({ error: "Error al actualizar el stock" });
-      }
+    if (err) {
+      return res.status(500).json({ error: "Error al actualizar el stock" });
+    }
 
-      if (result.affectedRows === 0) {
-          return res.status(404).json({ error: "No se encontró el registro" });
-      }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "No se encontró el registro" });
+    }
 
-      res.json({ message: "StockD aumentado exitosamente" });
+    res.json({ message: "StockD aumentado exitosamente" });
   });
 });
 
@@ -599,25 +600,25 @@ app.put('/aumentar-stockMayor', (req, res) => {
   const { id, cantidad } = req.body;
 
   if (!id || !cantidad) {
-      return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
+    return res.status(400).json({ error: "Faltan parámetros en la solicitud" });
   }
 
   const query = `
-      UPDATE menu 
-      SET stockG = stockG + ? 
+      UPDATE menu
+      SET stockG = stockG + ?
       WHERE id = ?;
   `;
 
   db.query(query, [cantidad, id], (err, result) => {
-      if (err) {
-          return res.status(500).json({ error: "Error al actualizar el stock" });
-      }
+    if (err) {
+      return res.status(500).json({ error: "Error al actualizar el stock" });
+    }
 
-      if (result.affectedRows === 0) {
-          return res.status(404).json({ error: "No se encontró el registro" });
-      }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "No se encontró el registro" });
+    }
 
-      res.json({ message: "StockG aumentado exitosamente" });
+    res.json({ message: "StockG aumentado exitosamente" });
   });
 });
 
@@ -742,6 +743,20 @@ app.put('/actualizar-comentario', (req, res) => {
     res.status(200).json({ message: 'Comentario del pedido actualizado con éxito' });
   });
 });
+
+
+app.delete('/borrar_ventas', (req, res) => {
+  const query = `DELETE FROM ventas`; // Elimina todos los registros de la tabla ventas
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error('Error al eliminar en la base de datos:', error);
+      res.status(500).json({ error: 'Error al eliminar en la base de datos' });
+    } else {
+      res.status(200).json({ message: 'Todos los datos de la tabla ventas han sido eliminados correctamente' });
+    }
+  });
+});
+
 
 
 
