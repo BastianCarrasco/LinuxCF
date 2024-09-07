@@ -17,7 +17,7 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root', // Usuario de la base de datos
-  // password: '', // Contraseña de la base de datos
+  //  password: '',
   password: '5150', // Contraseña de la base de datos
   database: 'fannyLinux' // Nombre de la base de datos
 });
