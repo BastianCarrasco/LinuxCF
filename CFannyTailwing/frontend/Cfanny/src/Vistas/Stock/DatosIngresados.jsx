@@ -12,7 +12,8 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
   const [tiposDisponibles, setTiposDisponibles] = useState([]); // Estado para almacenar los tipos disponibles
 
   // Agregar los tipos prohibidos aquí
-  const tiposProhibidos = [1, 2, 4, 10, 3, 12];
+  const tiposProhibidos = [];
+  const tiposProhibidosStock = [1,2, 4, 10, 3, 12];
 
   useEffect(() => {
     // Función para obtener los datos del menú y tipos disponibles
@@ -192,15 +193,19 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
                         placeholder="Modificar Precio"
                       />
                     </td>
-                    <td style={{fontSize:"20px"}}className="px-6 py-4 whitespace-nowrap">
+                    <td style={{ fontSize: "20px" }} className="px-6 py-4 whitespace-nowrap">
                       {item.stockG}<br />
-                      <input
-                        type="text"
-                        value={datosModificados.find(dato => dato.id === item.id)?.stockG || item.stockG}
-                        onChange={(e) => handleInputChange(item.id, 'stockG', e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded text-black w-full mt-2"
-                        placeholder="Modificar Stock"
-                      />
+                      {tiposProhibidosStock.includes(item.tipo) ? (
+                        <span>No editable</span>
+                      ) : (
+                        <input
+                          type="text"
+                          value={datosModificados.find(dato => dato.id === item.id)?.stockG || item.stockG}
+                          onChange={(e) => handleInputChange(item.id, 'stockG', e.target.value)}
+                          className="px-3 py-2 border border-gray-300 rounded text-black w-full mt-2"
+                          placeholder="Modificar Stock"
+                        />
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -212,6 +217,3 @@ export default function DatosIngresados({ onInsertSuccess, setTodoOculto }) {
     </div>
   );
 }
-
-
-
