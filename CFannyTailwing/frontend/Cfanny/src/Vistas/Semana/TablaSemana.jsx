@@ -3,7 +3,8 @@ import { obtenerDatosMenu } from '../Consultas/GET/getmenu';
 import { actualizarIdSemana } from '../Consultas/UPDATE/editarIdsemana';
 import { actualizarStockSemana } from '../Consultas/UPDATE/editarStockSemana';
 import { actualizarStockGlobal } from '../Consultas/UPDATE/sumarStockGlobal';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faReceipt } from '@fortawesome/free-solid-svg-icons';
 const TablaDia = ({ dia, datosSemana }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [diaSeleccionado, setDiaSeleccionado] = useState('');
@@ -11,29 +12,77 @@ const TablaDia = ({ dia, datosSemana }) => {
     const [valorInputs, setValorInputs] = useState({});
     const [datosMenu, setDatosMenu] = useState([]);
     const [datosSemanaFiltrados, setDatosSemanaFiltrados] = useState([]);
+    const [modalOpen2, setModalOpen2] = useState(false);
+    const [itemSeleccionado, setItemSeleccionado] = useState(null);
+    const [numeroIngresado, setNumeroIngresado] = useState('');
+    const [index, setindex] = useState(0);
 
     const ejecutarActualizacion = async () => {
         try {
-          const resultado = await actualizarStockGlobal();
-          console.log('Resultado de la actualización:', resultado);
+            const resultado = await actualizarStockGlobal();
+            console.log('Resultado de la actualización:', resultado);
         } catch (error) {
-          console.error('Error al ejecutar la actualización:', error);
+            console.error('Error al ejecutar la actualización:', error);
         }
 
         window.location.reload(); // Recargar la página una vez completada la actualización
-      };
+    };
+
+    const abrirModal2 = (item, index) => {
+        setindex(index)
+        setItemSeleccionado(item);
+        setModalOpen2(true);
+        console.log(item)
+        console.log(index)
+
+    };
+
+    useEffect(()=>{console.log(itemSeleccionado),[itemSeleccionado]})
+
+    const cerrarModal2 = () => {
+        setModalOpen2(false);
+        setItemSeleccionado(null);
+        setNumeroIngresado('');
+    };
+
+    const manejarActualizacion = async () => {
+        const diasNumeros = {
+            LUNES: 1,
+            MARTES: 2,
+            MIÉRCOLES: 3,
+            JUEVES: 4,
+            VIERNES: 5,
+            SÁBADO: 6
+        };
+
+        // Obtener el número correspondiente al día seleccionado
+        const numeroDia = diasNumeros[diaSeleccionado];
+        if (numeroIngresado) {
+            try {
+                const resultado = await actualizarStockSemana(numeroDia, itemSeleccionado.id, numeroIngresado);
+                console.log('Stock actualizado:', resultado);
+              //  window.location.reload(); // Recargar la página después de la actualización
+            } catch (error) {
+                console.error('Error al actualizar el stock:', error);
+            }
+        } else {
+            alert("Por favor ingrese un número válido.");
+        }
+        cerrarModal2(); // Cerrar el modal después de manejar la actualización
+    };
+
 
 
     function actualizarDias() {
         handleActualizarIdSemana()
-          .then(() => {
-            handleActualizarStockSemana();
-          })
-          .catch(error => {
-            console.error('Error al actualizar los días:', error);
-            // Maneja el error según sea necesario
-          });
-      }
+            .then(() => {
+                handleActualizarStockSemana();
+            })
+            .catch(error => {
+                console.error('Error al actualizar los días:', error);
+                // Maneja el error según sea necesario
+            });
+    }
 
 
     async function handleActualizarIdSemana() {
@@ -197,7 +246,7 @@ const TablaDia = ({ dia, datosSemana }) => {
                                                     key={item.id}
                                                     className={`px-4 py-2 rounded-lg ${botonesSeleccionados.includes(item.id) ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}
                                                     onClick={() => handleClick(item)}
-                                                   style={{fontSize:'20px'}}
+                                                    style={{ fontSize: '20px' }}
                                                 >
                                                     {item.nombre}
                                                 </button>
@@ -208,7 +257,7 @@ const TablaDia = ({ dia, datosSemana }) => {
                             ))}
                         </div>
 
-                        <div  style={{fontSize:'20px'}}>
+                        <div style={{ fontSize: '20px' }}>
                             <h2 className="text-xl font-semibold mb-4 text-white">Elementos seleccionados</h2>
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-700 text-white">
@@ -235,7 +284,7 @@ const TablaDia = ({ dia, datosSemana }) => {
                             </table>
                         </div>
 
-                        <div  style={{fontSize:'20px'}}>
+                        <div style={{ fontSize: '20px' }}>
                             <h2 className="text-xl font-semibold mb-4 text-white">Datos del Día {diaSeleccionado}</h2>
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-700 text-white">
@@ -264,7 +313,7 @@ const TablaDia = ({ dia, datosSemana }) => {
                             </table>
                         </div>
 
-                        <div  style={{fontSize:'20px'}} className="col-span-3 flex justify-between items-center mt-4">
+                        <div style={{ fontSize: '20px' }} className="col-span-3 flex justify-between items-center mt-4">
                             <button
                                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition duration-200"
                                 onClick={closeModal}
@@ -290,17 +339,54 @@ const TablaDia = ({ dia, datosSemana }) => {
                     <tr>
                         <th className="px-6 py-3 text-left">Nombre</th>
                         <th className="px-6 py-3 text-left">Stock</th>
+                        {/* <th className="px-6 py-3 text-left">Editar</th> */}
+
                     </tr>
                 </thead>
                 <tbody style={{ fontSize: "19px" }} className="bg-gray-500 divide-y divide-gray-600">
-                    {obtenerDatosDiaTodo(dia).map(item => (
-                        <tr key={item.id}>
-                            <td className="px-6 py-4">{item.nombre}</td>
-                            <td className="px-6 py-4">{item.stockD}</td>
-                        </tr>
-                    ))}
-                </tbody>
+                {obtenerDatosDiaTodo(dia).map((item, index) => (
+    <tr key={item.id}>
+        <td className="px-6 py-4">{item.nombre}</td>
+        <td className="px-6 py-4">{item.stockD}</td>
+        {/* <td className="px-6 py-4">
+            <button
+                onClick={() => abrirModal2(item, index)} // Pasas item e index
+                className="bg-green-500 text-white px-4 py-2 rounded ml-2"
+            >
+                <FontAwesomeIcon icon={faReceipt} />
+            </button>
+        </td> */}
+    </tr>
+))}
+            </tbody>
             </table>
+
+            {modalOpen2 && (
+                <div style={{color:"black"}} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg p-5">
+                        <h1 className="text-xl font-bold">Detalles del Elemento</h1>
+                        <p><strong>Día:</strong> {itemSeleccionado.dia}</p>
+                        <p><strong>Nombre:</strong> {itemSeleccionado.nombre}</p>
+                        <p><strong>Precio:</strong> {itemSeleccionado.precio}</p>
+                        <p><strong>Stock Disponible:</strong> {itemSeleccionado.stockD}</p>
+                        <p><strong>Tipo:</strong> {itemSeleccionado.tipo}</p>
+
+                        <label htmlFor="numero">Ingrese un número:</label>
+                        <input
+                            type="number"
+                            id="numero"
+                            value={numeroIngresado}
+                            onChange={(e) => setNumeroIngresado(e.target.value)}
+                            className="border p-2 mt-2 w-full"
+                        />
+
+                        <div className="flex justify-end mt-4">
+                            <button onClick={cerrarModal2} className="mr-2 bg-gray-300 p-2 rounded">Cerrar</button>
+                            <button onClick={manejarActualizacion} className="bg-red-500 text-white p-2 rounded">Actualizar Stock</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

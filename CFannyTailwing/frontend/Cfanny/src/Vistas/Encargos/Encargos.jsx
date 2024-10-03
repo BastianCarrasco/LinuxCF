@@ -13,20 +13,20 @@ export default function Encargos() {
 
 
 
-  
+
   const handleActualizarEstado = async (pedido) => {
     try {
       const barra = pedido.barra; // Asumimos que 'barra' está en el objeto pedido
       const nuevoEstado = 5; // Por ejemplo, '5' puede ser el estado para cancelado
-  
+
       // Actualizar el estado del pedido
       const resultadoEstado = await actualizarEstadoPedido(barra, nuevoEstado);
       console.log('Estado actualizado:', resultadoEstado);
-  
+
       // Eliminar el pedido
       const resultadoEliminacion = await eliminarPedido(parseInt(barra, 10));
       console.log('Pedido eliminado:', resultadoEliminacion);
-  
+
     } catch (error) {
       console.error('Error al actualizar el estado o eliminar el pedido:', error);
     }
@@ -37,19 +37,19 @@ export default function Encargos() {
 
   const handleCancel = async (n) => {
     const barraCancelar = n.barra;
-  
+
     // Utilizamos un bucle for...of para poder usar await dentro del bucle
     for (const element of pedidos) {
       if (element.barra === barraCancelar) {
         // Ejecuta reparador_stock y espera a que termine antes de continuar
         await reparador_stock(element);
-  
+
         // Actualiza el estado del pedido después de procesarlo
         handleActualizarEstado(element);
       }
     }
-  
-    
+
+
     fetchPedidos();
   };
 
@@ -115,6 +115,15 @@ export default function Encargos() {
     }
   };
 
+  const handlePrintBoletaCopia = async (barra) => {
+    const pedidosToPrint = pedidos.filter(pedido => pedido.barra === barra);
+    if (pedidosToPrint.length > 0) {
+
+      createAndPrintPDF(pedidosToPrint, barra); // Call the function directly
+
+    }
+  };
+
   const filteredPedidos = pedidos.filter(pedido => pedido.estado === 3);
 
   const mergeOrders = (pedidos) => {
@@ -156,58 +165,69 @@ export default function Encargos() {
         placeholder="Escanea o ingresa el código de barra aquí"
       /> */}
       <div className="overflow-x-auto w-full">
-        <table  style={{ textAlign: 'left',backgroundColor:'white', color: 'black' }} className="min-w-full divide-y divide-black-200 w-full">
-          <thead>
-            <tr>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">N</th>
-              <th className="px-4 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Texto Orden</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Cantidad</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Comentario</th>
-              <th className="px-2 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Precio</th>
-              <th className="px-4 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Cliente</th>
-              <th className="px-6 py-3 text-left text-2xl font-medium text-black-500 uppercase tracking-wider">Acciones</th>
-            </tr>
-          </thead>
-          <tbody style={{backgroundColor:'white', color: 'black'}}  className="bg-white divide-y divide-black-200 w-full">
-            {mergedPedidos.map((pedido, index) => (
-              <tr style={{backgroundColor:'white', color: 'black'}}  key={index} className={pedido.estado !== 3 ? "bg-blue-500 text-white" : ""}>
-                {pedido.rowSpan > 0 && (
-                  <td  tyle={{backgroundColor:'white', color: 'black'}}  className="px-2 py-4 whitespace-nowrap text-xl text-black-500" rowSpan={pedido.rowSpan}>
-                    {pedido.numeroOrden}
-                  </td>
-                )}
-                <td className="px-4 py-4 whitespace-nowrap text-xl text-black-500">{pedido.textoOrden}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl text-black-500">{pedido.cantidad}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl text-black-500">{pedido.comentario}</td>
-                <td className="px-2 py-4 whitespace-nowrap text-xl text-black-500">$ {parseInt(pedido.precio, 10)}</td>
+  <table className="min-w-full divide-y divide-black-200 bg-white text-black w-full">
+    <thead>
+      <tr>
+        <th className="px-4 py-3 text-left text-2xl font-medium uppercase tracking-wider w-1/12">N</th>
+        <th className="px-4 py-3 text-left text-2xl font-medium uppercase tracking-wider w-2/6">Texto Orden</th>
+        <th className="px-4 py-3 text-left text-2xl font-medium uppercase tracking-wider w-1/12">Cantidad</th>
+        <th className="px-4 py-3 text-left text-2xl font-medium uppercase tracking-wider w-1/6">Comentario</th>
+        <th className="px-4 py-3 text-left text-2xl font-medium uppercase tracking-wider w-1/6">Precio</th>
+        <th className="px-4 py-3 text-left text-2xl font-medium uppercase tracking-wider w-1/6">Cliente</th>
+        <th className="px-6 py-3 text-left text-2xl font-medium uppercase tracking-wider w-2/6">Acciones</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-black-200">
+      {mergedPedidos.map((pedido, index) => (
+        <tr key={index} className={pedido.estado !== 3 ? "bg-blue-500 text-white" : "bg-white text-black"}>
+          {pedido.rowSpan > 0 && (
+            <td className="px-4 py-4 whitespace-nowrap text-xl" rowSpan={pedido.rowSpan}>
+              {pedido.numeroOrden}
+            </td>
+          )}
+          <td className="px-4 py-4 whitespace-nowrap text-xl">{pedido.textoOrden}</td>
+          <td className="px-4 py-4 whitespace-nowrap text-xl">{pedido.cantidad}</td>
+          <td className="px-4 py-4 whitespace-nowrap text-xl">{pedido.comentario}</td>
+          <td className="px-4 py-4 whitespace-nowrap text-xl">$ {parseInt(pedido.precio, 10)}</td>
 
-                {pedido.rowSpan > 0 && (
+          {pedido.rowSpan > 0 && (
+            <td className="px-4 py-4 whitespace-nowrap text-xl">{pedido.cliente}</td>
+          )}
 
-                <td tyle={{backgroundColor:'white', color: 'black'}}  className="px-2 py-4 whitespace-nowrap text-xl text-black-500">{pedido.cliente}</td>
-              )}
-                {pedido.rowSpan > 0 && (
-                <td style={{backgroundColor:'white'}} className="px-6 py-4 whitespace-nowrap text-xl text-black-500">
+          {pedido.rowSpan > 0 && (
+            <td className="px-6 py-4 whitespace-nowrap text-xl">
+              <div className="flex space-x-4">
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
+                  onClick={() => handlePrintBoleta(pedido.barra)}
+                >
+                  Voucher/Boleta
+                </button>
 
-                  <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-                    onClick={() => handlePrintBoleta(pedido.barra)}
-                  >
-                    Voucher/Boleta
-                  </button>
+                <button
+                  className="bg-orange-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
+                  onClick={() => handlePrintBoletaCopia(pedido.barra)}
+                >
+                  Copia
+                </button>
 
-                  <button
-                      onClick={() => handleCancel(pedido)}
-                      className="bg-red-500 text-white px-4 py-2 rounded"
-                    >
-                      Cancelar
-                    </button>
-                </td>
- )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                <button
+                  onClick={() => handleCancel(pedido)}
+                  className="bg-red-500 text-white px-6 py-2 rounded"
+                >
+                  Cancelar
+                </button>
+
+
+              </div>
+            </td>
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
     </div>
   );
 }
