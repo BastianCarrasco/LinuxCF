@@ -191,7 +191,7 @@ app.put('/actualizar-menu/:id', (req, res) => {
 
 app.get('/datossemana', (req, res) => {
   // Query para seleccionar todos los datos del menú
-  const query = 'SELECT semana.numero, dia.dia, menu.id,menu.nombre,menu.tipo,menu.precio,semana.stockD FROM menu JOIN semana JOIN dia where semana.id_menu=menu.id and semana.id_dia=dia.id ';
+  const query = 'SELECT semana.numero, dia.dia, menu.id,menu.nombre,menu.tipo,menu.precio,semana.stockD,semana.id_semana FROM menu JOIN semana JOIN dia where semana.id_menu=menu.id and semana.id_dia=dia.id ';
 
   // Ejecutar la consulta
   db.query(query, (error, results) => {
@@ -755,12 +755,38 @@ app.delete('/borrar_ventas', (req, res) => {
       res.status(200).json({ message: 'Todos los datos de la tabla ventas han sido eliminados correctamente' });
     }
   });
+
+
+
+
+
 });
 
 
 
 
+app.put('/actualizar-semanaEmergencia', (req, res) => {
+  const { id_semana, stockD } = req.body; // Obtener id_semana y stockD desde el cuerpo de la solicitud
 
+  // Verificar si se proporciona stockD e id_semana en el cuerpo de la solicitud
+  if (!id_semana || !stockD) {
+    return res.status(400).json({ error: 'Los parámetros id_semana y stockD son obligatorios' });
+  }
+
+  // Query de actualización
+  const sql = "UPDATE semana SET stockD = ? WHERE id_semana = ?";
+
+  // Ejecutar la consulta en la base de datos utilizando db.query
+  db.query(sql, [stockD, id_semana], (err, result) => {
+    if (err) {
+      console.error('Error al ejecutar la consulta:', err);
+      res.status(500).json({ error: 'Error al actualizar la semana' });
+    } else {
+      console.log('Semana actualizada correctamente');
+      res.status(200).json({ message: 'Semana actualizada correctamente' });
+    }
+  });
+});
 
 
 // Escuchar en un puerto específico

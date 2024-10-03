@@ -5,6 +5,7 @@ import { actualizarStockSemana } from '../Consultas/UPDATE/editarStockSemana';
 import { actualizarStockGlobal } from '../Consultas/UPDATE/sumarStockGlobal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faReceipt } from '@fortawesome/free-solid-svg-icons';
+import { actualizarEmergencia } from '../Consultas/UPDATE/semanaEmergencia';
 const TablaDia = ({ dia, datosSemana }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [diaSeleccionado, setDiaSeleccionado] = useState('');
@@ -46,30 +47,28 @@ const TablaDia = ({ dia, datosSemana }) => {
     };
 
     const manejarActualizacion = async () => {
-        const diasNumeros = {
-            LUNES: 1,
-            MARTES: 2,
-            MIÉRCOLES: 3,
-            JUEVES: 4,
-            VIERNES: 5,
-            SÁBADO: 6
-        };
-
-        // Obtener el número correspondiente al día seleccionado
-        const numeroDia = diasNumeros[diaSeleccionado];
-        if (numeroIngresado) {
+        if (itemSeleccionado && numeroIngresado) {
             try {
-                const resultado = await actualizarStockSemana(numeroDia, itemSeleccionado.id, numeroIngresado);
+                // Llamar a la función actualizarEmergencia con id_semana y el nuevo stockD
+
+                const resultado = await actualizarEmergencia(
+                    itemSeleccionado.id_semana,
+                    parseInt(numeroIngresado, 10)
+                  );
+
                 console.log('Stock actualizado:', resultado);
-              //  window.location.reload(); // Recargar la página después de la actualización
+
+                // Recargar la página después de la actualización exitosa
+                window.location.reload();
             } catch (error) {
                 console.error('Error al actualizar el stock:', error);
             }
         } else {
-            alert("Por favor ingrese un número válido.");
+            // Mostrar un mensaje si no se ha ingresado un número válido
+            alert("Por favor ingrese un número válido y seleccione un item.");
         }
-        cerrarModal2(); // Cerrar el modal después de manejar la actualización
     };
+
 
 
 
@@ -348,45 +347,43 @@ const TablaDia = ({ dia, datosSemana }) => {
     <tr key={item.id}>
         <td className="px-6 py-4">{item.nombre}</td>
         <td className="px-6 py-4">{item.stockD}</td>
-        {/* <td className="px-6 py-4">
+        <td className="px-6 py-4">
             <button
                 onClick={() => abrirModal2(item, index)} // Pasas item e index
                 className="bg-green-500 text-white px-4 py-2 rounded ml-2"
             >
                 <FontAwesomeIcon icon={faReceipt} />
             </button>
-        </td> */}
+        </td>
     </tr>
 ))}
             </tbody>
             </table>
 
             {modalOpen2 && (
-                <div style={{color:"black"}} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white rounded-lg p-5">
-                        <h1 className="text-xl font-bold">Detalles del Elemento</h1>
-                        <p><strong>Día:</strong> {itemSeleccionado.dia}</p>
-                        <p><strong>Nombre:</strong> {itemSeleccionado.nombre}</p>
-                        <p><strong>Precio:</strong> {itemSeleccionado.precio}</p>
-                        <p><strong>Stock Disponible:</strong> {itemSeleccionado.stockD}</p>
-                        <p><strong>Tipo:</strong> {itemSeleccionado.tipo}</p>
+    <div style={{ color: "black", fontSize: "26px", border: "solid", borderBlockColor: "black" }} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white rounded-lg p-5">
+            <h1 className="text-xl font-bold">Detalles del Elemento</h1>
 
-                        <label htmlFor="numero">Ingrese un número:</label>
-                        <input
-                            type="number"
-                            id="numero"
-                            value={numeroIngresado}
-                            onChange={(e) => setNumeroIngresado(e.target.value)}
-                            className="border p-2 mt-2 w-full"
-                        />
+            <p><strong>Nombre:</strong> {itemSeleccionado.nombre}</p>
 
-                        <div className="flex justify-end mt-4">
-                            <button onClick={cerrarModal2} className="mr-2 bg-gray-300 p-2 rounded">Cerrar</button>
-                            <button onClick={manejarActualizacion} className="bg-red-500 text-white p-2 rounded">Actualizar Stock</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <label htmlFor="numero">Ingrese un número:</label>
+            <input
+                type="number"
+                id="numero"
+                value={numeroIngresado}
+                onChange={(e) => setNumeroIngresado(e.target.value)}
+                className="border p-2 mt-2 w-full"
+            />
+
+            <div className="flex justify-between mt-4"> {/* Cambiado a justify-between para separar los botones */}
+                <button onClick={cerrarModal2} className="bg-red-500 text-white p-2 rounded">Cerrar</button> {/* Fondo rojo con texto blanco */}
+                <button onClick={manejarActualizacion} className="bg-blue-500 text-white p-2 rounded">Actualizar Stock</button> {/* Fondo azul con texto blanco */}
+            </div>
+        </div>
+    </div>
+)}
+
         </div>
     );
 };
