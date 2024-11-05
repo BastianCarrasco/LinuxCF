@@ -17,7 +17,7 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root', // Usuario de la base de datos
-  //  password: '',
+  // password: '',
   password: '5150', // Contraseña de la base de datos
   database: 'fannyLinux' // Nombre de la base de datos
 });
@@ -150,6 +150,19 @@ app.post('/insertar-menu', (req, res) => {
   const { nombre, tipo, precio, stockG } = req.body;
   const query = `INSERT INTO menu (nombre, tipo, precio, stockG) VALUES (?, ?, ?, ?)`;
   db.query(query, [nombre, tipo, precio, stockG], (error, results) => {
+    if (error) {
+      console.error('Error al insertar en la base de datos:', error);
+      res.status(500).json({ error: 'Error al insertar en la base de datos' });
+    } else {
+      res.status(200).json({ message: 'Datos insertados correctamente' });
+    }
+  });
+});
+
+app.post('/insertar-menuid', (req, res) => {
+  const { id, nombre, tipo, precio, stockG } = req.body;
+  const query = `INSERT INTO menu (id, nombre, tipo, precio, stockG) VALUES (?, ?, ?, ?, ?)`;
+  db.query(query, [id, nombre, tipo, precio, stockG], (error, results) => {
     if (error) {
       console.error('Error al insertar en la base de datos:', error);
       res.status(500).json({ error: 'Error al insertar en la base de datos' });
